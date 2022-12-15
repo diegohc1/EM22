@@ -1,0 +1,51 @@
+---
+header-includes:
+  \renewcommand{\tablename}{Tabla}
+  \renewcommand{\contentsname}{Índice} 
+  \usepackage{booktabs}
+  \usepackage{longtable}
+  \usepackage{float}
+  \usepackage{array}
+
+title: "EM 22 - Correlaciones entre ítems"
+author: "DH"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(knitr)
+library(kableExtra)
+library(here)
+library(dplyr)
+
+load(here("02-reportes-scripts", "00-acomodaciones", "04-correlaciones-items.Rdata"))
+
+```
+
+## Matriz de correlaciones 
+
+```{r results = "asis", echo = FALSE}
+
+for(i in 1:length(corrs)){ #i=1
+
+cat("###", names(corrs[i]), "\n")
+
+corrs[[i]] %>% 
+  round(3) %>%
+  kable('latex', booktabs = T, longtable = F) %>%
+  kable_styling(latex_options = c('HOLD_position'), 
+                  position = 'center', 
+                  full_width = F,
+                  font_size = 8) %>%
+  print()
+  
+  
+}
+
+```
+

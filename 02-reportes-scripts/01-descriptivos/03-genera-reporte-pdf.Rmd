@@ -1,0 +1,100 @@
+---
+title: "EM 2022 - Reporte descriptivo de los cuestionarios de factores asociados"
+author: "Oficina de Medición de la Calidad de los Aprendizajes (UMC)"
+date: "15/03/2023"
+output:
+ pdf_document:
+  toc: yes
+  toc_depth: 3
+  latex_engine: xelatex
+params:
+  cuest: "EM2022_2Sdirector_EBR"
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(here)
+library(dplyr)
+
+load(file = here("02-reportes-scripts", "01-descriptivos", "01-descriptivos-ffaa.Rdata"))
+
+files <- list.files(
+  path = here("02-reportes-scripts", "01-descriptivos", "figuras-para-reportes", "00-nacional"),
+  #pattern = "*.pdf",
+  full.names = TRUE)
+
+bd <- filter(tab_final2, estrato == "General") %>%
+  mutate(rut = paste0(Concatena1, "_", cod_gen))
+
+
+```
+
+\pagebreak
+  
+# Introducción
+El presente documento tiene por objetivo reportar los resultados descriptivos de los 
+cuestionarios aplicados a directores, docentes, estudiantes y padres de familia en el marco de la Evaluación Muestral 2019 (EM 2019)
+
+Los cuestionarios de la EM  2019 contaron con un conjunto de preguntas que consideraron tanto
+características como percepciones de los actores que participaron en el estudio. Los cuestionarios incluyeron
+preguntas que conforman indicadores simples (p. ej. sexo), una serie de preguntas que representan constructos
+latentes (p. ej. agotamiento emocional) y preguntas abiertas (p. ej. ¿Qué opinión tiene sobre “Aprendo en
+casa”?). En este documento, se reporta las respuestas de los indicadores simples e indicadores que conforman
+un constructo.
+
+\pagebreak
+
+```{r echo=FALSE, results = 'asis', fig.align='center'}
+
+bd <- bd[which(bd$Concatena1 == params$cuest), ]
+
+nom <- unique(bd$Concatena1)
+
+for(i in 1:length(nom)){#i=1
+  
+  cat('\n')
+  cat("# ", unique(bd$Instrumento)[i], "\n") #nombre instrumento
+  cat('\n')
+  cat("### Resultados descriptivos", '\n')
+  
+  bd_i <- filter(bd, Concatena1 == nom[i])
+  gg <- unique(bd_i$rut)
+  files_i <- files[stringr::str_detect(files, nom[i])]
+  
+  for(j in 1:length(files_i)){ #j=1
+    
+  bd_ij <- filter(bd_i, rut == gg[j])
+  
+  cat('\n')
+  cat("### ", paste0(unique(bd_ij$cod_gen), ". ", unique(bd_ij$Pregunta)))  
+  cat('\n')
+  
+  #knitr::include_graphics(files_i[j]) no acepta loops, entonces cambiamos por ![]
+  # pero eso no acepta "fig.align='center'" -_-, pero eso si acepta ajustes al size...
+  # no podemos tener todo en la vida
+  
+  if(nrow(bd_ij) > 4){
+    
+    cat("![](",files_i[j],")", "\n")  
+  
+  }else if(nrow(bd_ij) == 2){   #si tiene pocas barras, un poco mas pequeño
+    
+    cat("![](",files_i[j],"){width=40%}", "\n") 
+    
+  }else if(nrow(bd_ij) > 2 & nrow(bd_ij) <= 4){
+    
+    cat("![](",files_i[j],"){width=65%}", "\n") 
+  
+    }
+    
+
+  
+  }
+  
+}
+
+```
+
+

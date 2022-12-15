@@ -27,10 +27,10 @@ matriz_cfa <- matriz %>%
          Enunciado, Analisis2, Invertir, OpcionE) 
 
 #mismas bases en miau y lista
-matriz_cfa <- matriz_cfa %>% filter(Concatena2 %in% names(lista))
-lista <- keep(lista, names(lista) %in% matriz_cfa$Concatena2)
+matriz_cfa <- matriz_cfa %>% filter(Concatena1 %in% names(lista))
+lista <- keep(lista, names(lista) %in% matriz_cfa$Concatena1)
 
-matriz_lista <- split(matriz_cfa, matriz_cfa$Concatena2) #separamos matriz en listas
+matriz_lista <- split(matriz_cfa, matriz_cfa$Concatena1) #separamos matriz en listas
 matriz_lista <- matriz_lista[names(lista)] #mismo orden
 
 #comprobemos si estan iguales
@@ -42,7 +42,7 @@ nom <- names(matriz_lista) #para filtrar
 indic_cfa <- NULL; cargas_cfa <- NULL
 indic_pca <- NULL; cargas_pca <- NULL
 
-for(i in 1:length(nom)){ #i=1
+for(i in 1:length(nom)){ #i=5
   
   #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i'
   matriz_i <- select(matriz_lista[[nom[i]]], starts_with(c("cod", "Cod")), Analisis2, Enunciado, Constructo, sub_escala)
@@ -51,7 +51,7 @@ for(i in 1:length(nom)){ #i=1
   
   bd <- lista[[nom[i]]] #tomamos la base i
   
-  for(j in 1:length(vcod_indice)){ #j=1
+  for(j in 1:length(vcod_indice)){ #j=8
     
     #Rutina para la escala 'j' de la base 'i'
     escala_j <- matriz_i[which(matriz_i$Cod_indice == vcod_indice[j]), ]
@@ -67,7 +67,7 @@ for(i in 1:length(nom)){ #i=1
        resultados1 <- pca_recursivo(bd2, recursivo = TRUE, puntajes = FALSE)
     }else{ # CFA
       mod <- acomoda_string_lavaan(preg)
-      resultados1 <- cfa_recursivo(bd2, model_lavaan = mod, recursivo = TRUE, puntajes = FALSE)
+      resultados1 <- cfa_recursivo(bd2, model_lavaan = mod, recursivo = TRUE, puntajes = TRUE)
     }
     
     # Ordenamos la información

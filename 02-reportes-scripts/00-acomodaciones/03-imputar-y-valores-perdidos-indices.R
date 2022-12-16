@@ -45,18 +45,15 @@ tabla_info_missing_pegar <- NULL
 correlaciones_lista <- map(lista, function(x) NULL)
 inspeccion_correlaciones_lista <- map(lista, function(x) NULL) 
 
-# agregamos ID
-lista <- map(lista, ~tibble::rowid_to_column(.x, "ID"))
-
 llavesl <- list(
   dir = c("ID", "cod_mod7", "anexo"), 
-  doc = c("ID", "cod_mod7", "anexo", "dsc_seccion"), 
-  fam = c("ID", "cod_mod7", "anexo", "dsc_seccion_imp", "cor_est")
+  doc = c("ID", "cod_mod7", "anexo", "cor_minedu", "dsc_seccion"), 
+  fam = c("ID", "cod_mod7", "anexo", "cor_minedu", "dsc_seccion_imp", "cor_est")
 )
 
 {
   inicio <- Sys.time()
-  for(i in 1:length(nom)){ #i=4
+  for(i in 1:length(nom)){ #i=1
     
     #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i'
     matriz_i <- matriz_lista[[nom[i]]]

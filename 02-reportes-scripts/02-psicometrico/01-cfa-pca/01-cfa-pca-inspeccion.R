@@ -21,10 +21,9 @@ lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01-imputada
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
 
 matriz_cfa <- matriz %>%
-  #filter(Analisis2 %in% c("CFA", "PCA")) %>%
+  filter(Analisis2 %in% c("CFA", "PCA")) %>%
   drop_na(Cod_indice) %>%
-  select(Concatena1, Constructo = Constructo_indicador,sub_escala, starts_with("Cod"), 
-         Enunciado, Analisis2, Invertir, OpcionE) 
+  select(Concatena1, Constructo = Constructo_indicador,sub_escala, starts_with("Cod"), Enunciado, Analisis2) 
 
 #mismas bases en miau y lista
 matriz_cfa <- matriz_cfa %>% filter(Concatena1 %in% names(lista))
@@ -152,11 +151,11 @@ indic_cfa1 <- indic_cfa %>%
   pivot_wider(names_from = Indicadores, values_from = c(inicial, sugerido), names_glue = "{Indicadores}_{.value}") 
 
 
-export(list("CFA_indicadores de ajuste" = indic_cfa1,
+rio::export(list("CFA_indicadores de ajuste" = indic_cfa1,
             "CFA_cargas factoriales" = cargas_cfa,
             "PCA_var_explicada" = indic_pca, 
             "PCA_cargas" = cargas_pca),
-       here("3-psicometrico", "1-reportes", "0-inspeccion-cfa-pca.xlsx"))
+       here("02-reportes-scripts", "02-psicometrico", "01-cfa-pca", "01-cfa-pca-inspeccion.xlsx"))
       
 
 

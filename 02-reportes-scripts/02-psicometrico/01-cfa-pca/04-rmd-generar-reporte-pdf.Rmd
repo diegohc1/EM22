@@ -1,0 +1,235 @@
+---
+header-includes:
+  \renewcommand{\tablename}{Tabla}
+  \renewcommand{\contentsname}{Índice} 
+  \usepackage{booktabs}
+  \usepackage{longtable}
+  \usepackage{float}
+  \usepackage{array}
+
+title: |
+  | EM 2022 Reporte psicométrico
+subtitle: 'Oficina de Medición de la Calidad de los Aprendizajes (UMC)'
+output:
+  pdf_document:
+    toc_depth: 3
+    latex_engine: xelatex
+params:
+  cuest: "EM2019_EBR_2P_F1Director"
+  fac: "DIR2PGEN_REFEST"
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.kable.NA = '')
+# params <- list(cuest = "EM2019_EBR_2P_F1Director", fac = "DIR2PGEN_LIDPE1")
+
+library(knitr)
+library(kableExtra)
+library(here)
+library(dplyr)
+library(purrr)
+library(ggplot2)
+
+#definimos un par de funciones:
+acomoda_tabla_descriptivos <- function(data){
+  nd <- ncol(data)
+  data %>%
+    kable('latex', booktabs = T, row.names = F, align = c('c','l', rep('c', nd-2)), 
+          caption = 'Distribución de respuestas') %>%    
+    kable_styling(latex_options = c('HOLD_position'), 
+                  position='center', 
+                  full_width = F, 
+                  font_size = 8) %>%
+    column_spec(2, width = '6cm') %>%
+    column_spec(3:nd, width = if_else(nd > 6,'1.3cm','1.8cm'))
+}
+
+acomoda_tablas_indica <- function(data, tit){
+  data %>%
+    kable('latex', booktabs = T, longtable = F, row.names = F, caption = tit) %>%
+    kable_styling(latex_options = c('HOLD_position'), 
+                  position = 'center', 
+                  full_width = F,
+                  font_size = 8)
+}
+
+
+#*********************************************************************************************************************+
+
+filesfigs <- list.files(
+  path = here("02-reportes-scripts", "02-psicometrico", "01-cfa-pca", "figuras-para-reportes"),
+  #pattern = "*.pdf",
+  full.names = TRUE)
+
+load(here("02-reportes-scripts", "02-psicometrico", "01-cfa-pca", "03-insumos-para-reporte.Rdata"))
+miss <- rio::import(here("02-reportes-scripts", "00-acomodaciones", "03-valores-perdidos-indices.xlsx"))
+
+# filtramos la info según cuestionario y factor 
+esc <- insumos_reporte$insumos[[params$cuest]][[params$fac]]
+tex <- filter(insumos_reporte$textos, Concatena1 == params$cuest, Cod_indice == params$fac)
+miss2 <- filter(miss, cod_indice == params$fac)
+
+# acomodamos tabla de missing 
+miss3 <- miss2 %>%
+  gather() %>%
+  filter(!key %in% c("cod_indice", "constructo")) %>%
+  mutate(key = ifelse(key == "Total", "Total (n)", key),
+         key = ifelse(key != "Total (n)", paste(key, "(%)"), key))  %>%
+  rename('Patrón' = key, Valores = value)
+
+
+# acomodaciones para las tablas 
+esc[[2]] <- esc[[2]] %>% mutate(across(where(is.numeric), round, 3))
+
+if(grepl(params$fac, insumos_reporte$tipo$CFA)){
+  esc[[3]] <- esc[[3]] %>% mutate(across(where(is.numeric), round, 4))
+}
+
+```
+
+```{r uno, results = "asis", echo = FALSE}
+
+cats <- function(...) cat(..., "\n")
+
+cats("**Escala**:", "\n", tex$tit_escala, "\n")
+cats("**Muestra**:", "\n", tex$Instrumento, "\n")
+cats("\n", tex$texto)
+
+cat("\n#### Análisis descriptivo: {-}","\n",
+"A continuación, se presentan los porcentajes de marcado para cada ítem según categoría de respuesta.","\n")
+print(acomoda_tabla_descriptivos(esc[[1]]))
+cat('\n')
+cat("El porcentaje de valores perdidos e imputados se resume en la siguiente tabla:")
+
+miss3 %>%
+  kable('latex', booktabs = T, longtable = F, row.names = F) %>%
+  kable_styling(latex_options = c('HOLD_position'), 
+                position = 'center', full_width = F, font_size = 8) %>%
+  print()
+
+
+cat('\n')
+
+if(grepl(params$fac, insumos_reporte$tipo$CFA)){
+  
+  cat("\n#### Análisis psicométrico: {-}","\n",
+      "En las siguientes tablas se presentan las cargas factoriales y los indicadores de ajuste de la escala.","\n")
+  print(acomoda_tablas_indica(esc[[2]], tit = 'Cargas factoriales estandarizadas'))
+  cat('\n')
+  print(acomoda_tablas_indica(esc[[3]], tit = 'Indicadores de ajuste'))
+  cat("\n Asimismo, se encontró una confiabilidad, medida con el xxxxxx, de", round(esc[[4]], 2)) 
+  
+}else{
+  
+  cat("\n#### Análisis psicométrico: {-}","\n",
+       "Se encontró que el primer componente explica el", esc[[3]], "%  de la varianza. 
+      En la siguientes tabla se presenta los pesos y cargas del primer componente.","\n")
+  print(acomoda_tablas_indica(esc[[2]], tit = 'Pesos y cargas en el primer componente'))
+  cat('\n')
+  cat("\n Asimismo, se encontró una confiabilidad, medida con el xxxxxx, de", round(as.numeric(esc[[4]]), 2) )
+  
+  
+}   
+
+
+
+#names(data) <- gsub("_", "", names(data))    # remove
+#names(data) <- gsub("_", "\\_", names(data)) # escape
+#names(data) <- gsub("_", " ", names(data))   # replace with space
+
+
+
+```
+
+```{r figura, echo=FALSE, fig.align='center', warning=FALSE, out.width="65%", results="asis", fig.height = 4}
+cat("La distribución de los valores estimados de la variable latente se muestra en la siguiente figura:")
+
+knitr::include_graphics(filesfigs[grepl(params$fac, filesfigs)])
+
+```
+
+```{r loop, results = "asis", echo = FALSE}
+
+
+
+
+knitr::knit_exit()
+
+
+
+
+# for(i in 1:length(cuest)){ #i=1
+#   
+#   textos_i <- textos[which(textos$Concatena2 == params$cuest), ]
+#   
+#   cat('\n')
+#   cat(unique(textos_i$encab_cuest), "\n")
+#   cat('\n')
+#   
+#   textos_i_cfa <- textos_i[which(textos_i$Analisis2_final  == "CFA"), ]
+#   textos_i_pca <- textos_i[which(textos_i$Analisis2_final  == "PCA"), ]
+#   cods1 <- unique(textos_i_cfa$Cod_indice)
+#   cods2 <- unique(textos_i_pca$Cod_indice)
+#   
+#   if(purrr::is_empty(cods1) == FALSE){ #si es tru se aplica
+#     
+#     cat('## Constructos reflexivos')
+#     cat('\n')
+#     
+#     for(j in 1:length(cods1)){  #j=1 
+#       
+#       cat('\n')
+#       cat(textos_i_cfa$tit_escala[j], "\n")
+#       cat('\n')
+#       cat(textos_i_cfa$texto[j], "\n")
+#       
+#       cat("\n#### Análisis descriptivo: {-}","\n",
+#        "A continuación, se presentan los porcentajes de marcado para cada ítem según categoría de respuesta.","\n")
+#       print(acomoda_tabla_descriptivos(ins1[[cuest[i]]][[cods1[j]]][[1]]))
+#       
+#       cat("\n#### Análisis psicométrico: {-}","\n",
+#        "En las siguientes tablas se presentan las cargas factoriales y los indicadores de ajuste de la escala.","\n")
+#       
+#       print(acomoda_tablas_indica(ins1[[cuest[i]]][[cods1[j]]][[2]], tit = 'Cargas factoriales estandarizadas'))
+#       cat('\n')
+#       print(acomoda_tablas_indica(ins1[[cuest[i]]][[cods1[j]]][[3]], tit = 'Indicadores de ajuste'))
+#       cat('\n')
+#       
+#     }
+#     
+#     }
+#   
+#   if(purrr::is_empty(cods2) == FALSE){  
+#     
+#     cat('## Constructos formativos')
+#     cat('\n')
+#     
+#     for(j in 1:length(cods2)){  #j=1 
+#       
+#       cat('\n')
+#       cat(textos_i_pca$tit_escala[j], "\n")
+#       cat('\n')
+#       cat(textos_i_pca$texto[j], "\n")
+#       
+#       cat("\n#### Análisis descriptivo: {-}","\n",
+#        "A continuación, se presentan los porcentajes de marcado para cada ítem según categoría de respuesta.","\n")
+#       print(acomoda_tabla_descriptivos(ins2[[cuest[i]]][[cods2[j]]][[1]]))
+#       
+#       cat("\n#### Análisis psicométrico: {-}","\n",
+#        "Se encontró que el primer componente explica el", ins2[[cuest[i]]][[cods2[j]]][[3]], "%  de la varianza. 
+#       En la siguientes tabla se presenta los pesos y cargas del primer componente.","\n")
+#       print(acomoda_tablas_indica(ins2[[cuest[i]]][[cods2[j]]][[2]], tit = 'Pesos y cargas en el primer componente'))
+#       cat('\n')
+#       
+#     }
+#     
+#     }
+#   
+# }
+
+```
+
+
+

@@ -24,8 +24,7 @@ matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8f
 
 matriz_efa <- matriz %>%
   filter(!is.na(Cod_indice), Analisis1 == "EFA") %>%
-  select(Concatena1, Constructo = Constructo_indicador,
-         sub_escala, starts_with("Cod"), Enunciado, Analisis2, Invertir, OpcionE) 
+  select(Concatena1, Constructo = Constructo_indicador, sub_escala, starts_with("Cod"), Enunciado) 
 
 #mismas bases en miau y lista
 matriz_efa <- filter(matriz_efa, Concatena1 %in% names(lista))
@@ -44,8 +43,7 @@ indica_ajuste <- NULL
 for(i in 1:length(nom)){ #i=2
   
   #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i' #
-  matriz_i <- select(matriz_lista[[nom[i]]], cod_gen, cod_preg, Cod_indice, 
-                     Analisis2, Invertir, Enunciado, Constructo)
+  matriz_i <- select(matriz_lista[[nom[i]]], cod_gen, cod_preg, Cod_indice, Enunciado, Constructo)
   vcod_indice <- unique(matriz_i$Cod_indice) #escalas del cuestionario i
   bd <- lista[[nom[i]]] #tomamos la base i
   
@@ -55,7 +53,6 @@ for(i in 1:length(nom)){ #i=2
     escala_j <- filter(matriz_i, Cod_indice == vcod_indice[j])
     preg <- pull(escala_j, cod_preg) #preguntas de la escala
     enunciado <- pull(escala_j, Enunciado) #enunciados de la escala
-    inver <- select(escala_j, Invertir, cod_preg) #items por invertir
     cons <- unique(escala_j$Constructo) #nombre constructo
     
     bd1 <- select(bd, all_of(preg)) #base con id, para pegar despues y descriptivos
@@ -136,23 +133,11 @@ cargas_efa <- mutate(cargas_efa, mutate(across(where(is.numeric), round, 4)))
 
 rio::export(
   list(detalle = detalle, indicadores = indica_ajuste, cargas = cargas_efa),
-  here("3-psicometrico", "0-indicadores-efa.xlsx")
+  here("02-reportes-scripts", "02-psicometrico", "00-efa", "00-efa-indicadores.xlsx")
   )
 
-
-
-# antiguo 
-#cargas factoriales
-# cargas_efa_pegar <- 
-#   map(fa_1_4, 
-#       ~as.data.frame(unclass(.x$loadings)) %>%
-#         rownames_to_column("items")) %>%
-#   set_names(c(1:4)) %>%
-#   bind_rows(.id = "nfac") %>%
-#   mutate(Base = nom[i], 
-#          enunciado = rep(enunciado, 4),  
-#          cod_escala = vcod_indice[j], 
-#          constructo = all_of(cons)[1]) %>%
-#   select(Base, constructo, cod_escala, nfac, enunciado, items, everything())
+# reporte en pdf
+r <- here("02-reportes-scripts", "02-psicometrico", "00-efa", "01-genera-reporte-pdf.Rmd")
+rmarkdown::render(r, output_file = '01-efa-reporte', envir = new.env())
 
 

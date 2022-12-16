@@ -41,7 +41,7 @@ corrs[[i]] %>%
   kable_styling(latex_options = c('HOLD_position'), 
                   position = 'center', 
                   full_width = F,
-                  font_size = 8) %>%
+                  font_size = 7) %>%
   print()
   
   

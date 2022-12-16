@@ -113,6 +113,9 @@ lista3[[2]] %>% View()
 
 
 # (6) guardar las bases ! 
+# agregamos ID 
+# para pegar más facil despues! 
+lista3 <- map(lista3, ~tibble::rowid_to_column(.x, "ID"))
 
 names(lista3)
 export_list(lista3, here("01-data", "02-con-etiquetas", paste0(names(lista3), ".sav")))

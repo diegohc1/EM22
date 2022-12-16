@@ -1,0 +1,96 @@
+---
+header-includes:
+  \renewcommand{\tablename}{Tabla}
+  \renewcommand{\contentsname}{Índice} 
+  \usepackage{booktabs}
+  \usepackage{longtable}
+  \usepackage{array}
+  \usepackage{multirow}
+  \usepackage{wrapfig}
+  \usepackage{float}
+  \usepackage{colortbl}
+  \usepackage{pdflscape}
+  \usepackage{tabu}
+  \usepackage{threeparttable}
+  \usepackage{threeparttablex}
+  \usepackage[normalem]{ulem}
+  \usepackage{makecell}
+  \usepackage{xcolor}
+
+
+title: "Análisis factorial exploratorio"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+date: '2022-12-01'
+geometry: margin=2cm
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(kableExtra)
+library(here)
+library(dplyr)
+
+efa1 <- rio::import(here::here("02-reportes-scripts", "02-psicometrico", "00-efa", "00-efa-indicadores.xlsx"), sheet = 2)
+efa2 <- rio::import(here::here("02-reportes-scripts", "02-psicometrico", "00-efa", "00-efa-indicadores.xlsx"), sheet = 3)
+
+cods <- unique(efa1$cod_escala)
+
+efa2b <- efa2 %>%
+  select(cod_escala, cod_preg, Enunciado, 6:15) %>%
+  mutate(across(where(is.numeric), round, 2),
+         across(where(is.numeric), ~ifelse(abs(.x) < .40, "", .x)))
+
+efa1 <- efa1 %>%
+  mutate(across(where(is.numeric), round, 3))
+
+```
+
+\pagebreak
+
+```{r results = "asis", echo = FALSE}
+
+for(i in 1:length(cods)){ #i=1
+  
+  efa2b_i <- filter(efa2b, cod_escala == cods[i]) %>% select(-cod_escala)
+  efa1_i <- filter(efa1, cod_escala == cods[i])
+  construc <- efa1_i %>% pull(constructo) %>% unique()
+  
+  cat("###", cods[i], "-", construc, "\n")
+  
+  cat("El análisis paralelo sugiere", efa1_i$PA_factores[1], "factor(es)", "o", efa1_i$PA_ncomp[1], "componente(s)", "\n")
+  
+  efa2b_i %>% 
+    kable('latex', booktabs = T, longtable = F, align = c('l','l', rep('c', 12)),
+          caption = 'Análisis factorial exploratorio: Cargas factoriales para modelos de 1 a 4 factores') %>%
+    kable_styling(latex_options = c("striped", 'HOLD_position'), 
+                  position = 'center', 
+                  full_width = F,
+                  font_size = 6) %>%
+    column_spec(1, width = '0.80cm') %>%
+    column_spec(2, width = '6cm') %>%
+    column_spec(3:12, width = '0.70cm') %>%
+    add_header_above(c(" " = 2, "1" = 1, "2" = 2, "3" = 3, "4" = 4)) %>%
+    add_footnote(
+    c("Para el análisis factorial exploratorio se utilizó la matriz de correlación policórica y se estimó mediante minimos ponderados (WLS, por sus siglas en ingles)", 
+      "Se muestran las cargas factoriales mayores a .40")) %>%
+    print()
+  
+  efa1_i %>%
+    select(nfac:MAP) %>%
+    kable('latex', booktabs = T, longtable = F,
+          caption = 'Análisis factorial exploratorio: Indicadores de ajuste para modelos de 1 a 4 factores') %>%
+    kable_styling(latex_options = c('HOLD_position'), 
+                  position = 'center', 
+                  full_width = F,
+                  font_size = 6) %>%
+    print()
+  
+   cat("\n\\newpage\n")
+  
+}
+
+```

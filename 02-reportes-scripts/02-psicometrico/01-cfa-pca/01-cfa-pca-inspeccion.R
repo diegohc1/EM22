@@ -40,7 +40,9 @@ nom <- names(matriz_lista) #para filtrar
 #para guardar 
 indic_cfa <- NULL; cargas_cfa <- NULL
 indic_pca <- NULL; cargas_pca <- NULL
+prec <- map(lista, function(x) NULL)
 
+inicio <- Sys.time()
 for(i in 1:length(nom)){ #i=5
   
   #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i'
@@ -50,7 +52,7 @@ for(i in 1:length(nom)){ #i=5
   
   bd <- lista[[nom[i]]] #tomamos la base i
   
-  for(j in 1:length(vcod_indice)){ #j=8
+  for(j in 1:length(vcod_indice)){ #j=4
     
     #Rutina para la escala 'j' de la base 'i'
     escala_j <- matriz_i[which(matriz_i$Cod_indice == vcod_indice[j]), ]
@@ -61,13 +63,20 @@ for(i in 1:length(nom)){ #i=5
     bd1 <- bd[preg$cod_preg]
     bd2 <- drop_na(bd1) # listo para correr! 
     
+    
+    prec[[i]][[vcod_indice[j]]]  <- tryCatch({ # para ver donde estan los warnings 
+    
     # Corremos el modelo según PCA o CFA
     if(tipo[j] == "PCA"){ 
        resultados1 <- pca_recursivo(bd2, recursivo = TRUE, puntajes = FALSE)
     }else{ # CFA
       mod <- acomoda_string_lavaan(preg)
-      resultados1 <- cfa_recursivo(bd2, model_lavaan = mod, recursivo = TRUE, puntajes = TRUE)
+      resultados1 <- cfa_recursivo(bd2, model_lavaan = mod, recursivo = TRUE, puntajes = FALSE)
     }
+    
+      }, warning = function(w) print(w$message)
+    )
+    
     
     # Ordenamos la información
     if(tipo[j] == "PCA"){ 
@@ -135,7 +144,12 @@ for(i in 1:length(nom)){ #i=5
   }
   
 }
-    
+final <- Sys.time()
+final - inicio     
+
+# para ver donde estan los warnings ! 
+flatten(prec) %>% View()
+
 
 #rr <- here("2-psicometrico", "1-inspeccion-cfa")
 #ifelse(!dir.exists(rr), dir.create(rr), FALSE)

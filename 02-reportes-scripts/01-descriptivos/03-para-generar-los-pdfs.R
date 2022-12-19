@@ -16,7 +16,7 @@ for (i in 1:length(cuest)) { #i=1
 
 
 # reporte por region ----- 
-
+# aun no esta! 
 load(file = here("4-descriptivos", "01-descriptivos-ffaa.Rdata"))
 cuest <- unique(tab_final2$Concatena2)
 tabla_reg <- tab_final2 %>% filter(tipo == "Region") 

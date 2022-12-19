@@ -47,8 +47,9 @@ nom <- names(matriz_lista) #para filtrar
 ins <- map(lista, function(x) NULL) #para guardar los insumos del RT
 puntajes <- map(lista, function(x) NULL) 
 puntajes_lista <- NULL
+prec <- map(lista, function(x) NULL)
 
-quieres_puntajes <- TRUE
+quieres_puntajes <- FALSE
 
 # para seleccionar llaves
 llavesl <- list(
@@ -60,7 +61,7 @@ llavesl <- list(
 
 {
   inicio <- Sys.time()
-  for(i in 1:length(nom)){ #i=1
+  for(i in 1:length(nom)){ #i=2
     
     #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i'
     matriz_i <- select(matriz_lista[[nom[i]]], starts_with(c("cod", "Cod")), Analisis2, Enunciado, Constructo, sub_escala)
@@ -80,7 +81,7 @@ llavesl <- list(
       ll <- llavesl[[3]]
     }
     
-    for(j in 1:length(vcod_indice)){ #j=1
+    for(j in 1:length(vcod_indice)){ #j=3
       
       #Rutina para la escala 'j' de la base 'i'
       escala_j <- matriz_i[which(matriz_i$Cod_indice == vcod_indice[j]), ]
@@ -93,6 +94,8 @@ llavesl <- list(
       bd2 <- drop_na(bd1)
       bd3 <- bd2[preg$cod_preg] 
       
+     prec[[i]][[j]]  <- tryCatch({ # para ver donde estan los warnings ! 
+       
       # Corremos el modelo según PCA o CFA
       if(tipo[j] == "PCA"){ 
         resultados1 <- pca_recursivo(bd3, recursivo = FALSE, puntajes = quieres_puntajes)
@@ -100,6 +103,8 @@ llavesl <- list(
         mod <- acomoda_string_lavaan(preg)
         resultados1 <- cfa_recursivo(bd3, model_lavaan = mod, recursivo = FALSE, puntajes = quieres_puntajes)
       }
+        }, warning = function(w) print(w$message)
+      )
       
       if(quieres_puntajes != FALSE){
         if(tipo[j] == "PCA"){ #nombre a la columna generada con PCA
@@ -134,9 +139,10 @@ llavesl <- list(
   final <- Sys.time()
   final - inicio 
 }
-# se demoró 23 min (!) ... pero con todas las escalas de la EM :O... 1 hora? 
-# 24 min [segunda vez]
-# 25 min tercera vez
+
+# para ver donde estan los warnings ! 
+flatten(prec) %>% View()
+
 
 m_constructos <- matriz_cfa %>%
   mutate(Cod_indice2 = ifelse(is.na(Cod_indice2), Cod_indice, Cod_indice2)) %>%

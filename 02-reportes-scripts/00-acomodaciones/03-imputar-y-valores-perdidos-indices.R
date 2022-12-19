@@ -61,7 +61,7 @@ llavesl <- list(
     
     bd <- lista[[nom[i]]] #tomamos la base i
     
-    for(j in 1:length(vcod_indice)){ #j=1
+    for(j in 1:length(vcod_indice)){ #j=2
       
       #Rutina para la escala 'j' de la base 'i'
       escala_j <- matriz_i[which(matriz_i$Cod_indice == vcod_indice[j]), ]
@@ -108,7 +108,7 @@ llavesl <- list(
       #para invertir
       if(any(!is.na(escala_j$Invertir))){
         items_invertir <- filter(escala_j, Invertir == "Invertir")$cod_preg
-        bd3 <- mutate(bd3, across(all_of(items_invertir), ~invertir(.x, max(select(bd3, -id2)))))
+        bd3 <- mutate(bd3, across(all_of(items_invertir), ~invertir(.x, max(select(bd3, -ID)))))
       }
       
       #para eliminar la opcion que no entra al modelo

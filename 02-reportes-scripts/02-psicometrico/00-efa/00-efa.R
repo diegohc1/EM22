@@ -39,6 +39,7 @@ matriz_vs_lista(matriz_lista, lista)
 nom <- names(matriz_lista) #para filtrar
 cargas_efa <- NULL
 indica_ajuste <- NULL
+prec <- map(lista, function(x) NULL)
 
 for(i in 1:length(nom)){ #i=2
   
@@ -47,7 +48,7 @@ for(i in 1:length(nom)){ #i=2
   vcod_indice <- unique(matriz_i$Cod_indice) #escalas del cuestionario i
   bd <- lista[[nom[i]]] #tomamos la base i
   
-  for(j in 1:length(vcod_indice)){ #j=1
+  for(j in 1:length(vcod_indice)){ #j=1 #retire '1' porque no esta corriendo, luego vemos 
     
     #Rutina (puntajes e insumos RT) para la escala 'j' de la base 'i'
     escala_j <- filter(matriz_i, Cod_indice == vcod_indice[j])
@@ -57,6 +58,8 @@ for(i in 1:length(nom)){ #i=2
     
     bd1 <- select(bd, all_of(preg)) #base con id, para pegar despues y descriptivos
     bd1 <- drop_na(bd1)
+    
+   #prec[[i]][[vcod_indice[j]]]  <- tryCatch({ # para ver donde estan los warnings 
     
     #aplicamos EFA, de 1 a 4 factores #**********************************
     
@@ -68,6 +71,10 @@ for(i in 1:length(nom)){ #i=2
     
     #parallel analysis
     paralel <- fa.parallel(bd1, cor = "poly", fm = "wls", plot = FALSE)
+    
+    # }, warning = function(w) print(w$message),
+    #   error = function(e) print(e$error)
+    # )
     
     #indicadores de ajuste EFA y VSS, MAP
     indica_ajuste_pega <- data.frame(
@@ -139,5 +146,14 @@ rio::export(
 # reporte en pdf
 r <- here("02-reportes-scripts", "02-psicometrico", "00-efa", "01-genera-reporte-pdf.Rmd")
 rmarkdown::render(r, output_file = '01-efa-reporte', envir = new.env())
+
+
+
+# warnings ? 
+prec
+
+
+
+
 
 

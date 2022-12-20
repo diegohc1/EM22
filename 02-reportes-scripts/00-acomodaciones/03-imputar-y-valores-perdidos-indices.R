@@ -100,7 +100,7 @@ llavesl <- list(
       pred <- mice(bd2, maxit = 0, print = F)$predictorMatrix #'falso' mice, para excluir id
       pred[, llave] <- 0 #excluir id de la prediccion
       
-      mice_data <- mice(bd2, m = 1, maxit = 20, meth = 'pmm', predictorMatrix = pred, seed = 343, print = FALSE) #imputacion
+      mice_data <- mice(bd2, m = 1, maxit = 20, meth = 'pmm', predictorMatrix = pred, seed = 2022, print = FALSE) #imputacion
       # m=1 porque solo usaremos la primera imputación.... 
       bd3 <- as_tibble(complete(mice_data, 1)) # bd3: datos imputados
       #***********

@@ -67,6 +67,7 @@ map(pca_uno, "cargas") %>%
   bind_rows(.id = "indicador") %>%
   show_in_excel()
 
+pca_dos$cargas
 
 # #generar reporte en excel
 # 

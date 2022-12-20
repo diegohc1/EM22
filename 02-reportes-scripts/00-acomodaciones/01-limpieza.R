@@ -21,7 +21,7 @@ library(tidyverse)
 
 # bases de datos 
 lista = rio::import_list(Sys.glob(here("01-data", "01-depuradas", "*.sav")))
-
+lista$EM2022_2Sdirector_EBR$p06
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
 
@@ -61,33 +61,97 @@ map(1:length(lista), ~sapply(lista[[.x]][preg_recod[[.x]]], table))
 para_recod <- setNames(1:16, LETTERS[1:16])
 para_recod <- para_recod[names(para_recod) != "M"]
 
-lista_numero <- map2(lista, preg_recod, 
+lista2 <- map2(lista, preg_recod, 
                ~mutate(.x, across(all_of(.y), ~recode(.x, !!!para_recod, .default = NA_integer_)))
                )
 
-# lista_numero[[1]] %>% View()
+# asegurar que respuestas numericas sean numeros ! 
+preg_recod_num <- map(matriz1_l, ~filter(.x, TipoV == "Numerica") %>% pull(cod_preg))
+preg_recod_num <- compact(preg_recod_num)
+
+for(i in 1:length(preg_recod_num)){ #i=1
+  nomnum <- names(preg_recod_num[i])
+  pregnum <- preg_recod_num[[i]]
+  lista2[[nomnum]] <- lista2[[nomnum]] %>% mutate(across(all_of(pregnum), as.numeric))
+}
 
 
 # (2) ajustar inconsistencias ----
 
-# (?)
+matriz %>% 
+  filter(!is.na(Inconsistencia)) %>%
+  select(Concatena1, Inconsistencia)
 
+# director ****
+# no puedes tener más experiencia especifica que general 
+lista2$EM2022_2Sdirector_EBR <- lista2$EM2022_2Sdirector_EBR %>%mutate(p06 = ifelse(p06 > p05, p05, p06))  
+
+# lista2$EM2022_2Pdirector_EBR <- lista2$EM2022_2Pdirector_EBR %>% mutate(p05 = ifelse(p05 > p04, p04, p05))  
+
+# si no tienes tit pedagogico, solo puedes marcar que 
+lista2$EM2022_2Sdirector_EBR <- lista2$EM2022_2Sdirector_EBR %>% mutate(p04 = ifelse(p03 == 1, 1, p04))
+
+# lista2$EM2022_2Pdirector_EBR <- lista2$EM2022_2SPdirector_EBR %>% mutate(p04 = ifelse(p03 == 1, 1, p04))
+# 
+# lista2$EM2022_6Pdirector_EBR <- lista2$EM2022_6Pdirector_EBR %>% mutate(p04 = ifelse(p03 == 1, 1, p04))
+
+# docente ****
+# si no has terminado tus estudios secundarios, no puedes tenet tit pedagogico 
+lista2$EM2022_2SdocenteCOM_EBR <- lista2$EM2022_2SdocenteCOM_EBR %>% mutate(p04 = ifelse(p03 == 1, 1, p04))
+
+lista2$EM2022_2SdocenteCYT_EBR <- lista2$EM2022_2SdocenteCYT_EBR %>% mutate(p04 = ifelse(p03 == 1, 1, p04))
+
+# lista2$EM2022_4PdocenteMAT_EBR  <- lista2$EM2022_4PdocenteMAT_EBR %>% mutate(p05 = ifelse(p04 == 1, 1, p05))
+# 
+# lista2$EM2022_4PdocenteCOM_EBR <- lista2$EM2022_4PdocenteCOM_EBR %>% mutate(p05 = ifelse(p04 == 1, 1, p05))
+
+# si no enseñas ciencia, para otra oportunidad 
+lista2$EM2022_2SdocenteCYT_EBR <- lista2$EM2022_2SdocenteCYT_EBR %>%
+  mutate(temp = case_when(
+    p06_01 == 1 & p06_02 == 1 & p06_03 == 1 & p06_04 == 1 & p06_05 == 1 & p06_06 == 1 & p06_07 == 2 ~ "seva",
+    TRUE ~ NA_character_)) %>%
+  filter(temp == "seva") %>%
+  select(-temp)
+
+# estudiante ****
+# no puedes repetir si nunca lo has hecho
+lista2$EM2022_2Sestudiante_EBRD1 <- lista2$EM2022_2Sestudiante_EBRD1 %>%
+  mutate(p05 = ifelse(p04 == 1, 1, p05), p04 = ifelse(p05 == 1, 1, p04))
+
+
+# (2.1) agregar columnas de conocimiento pedagogico ----
+claves <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0", 2)
+f1 <- function(p, c){ifelse(p == c, 1, 0)} # funcion de ayuda
+
+conc <- unique(claves$Concatena1)
+for(i in 1:2){# i=1
+  cpreg <- filter(claves, Concatena1 == conc[[i]])$cod_preg
+  correcta <- filter(claves, Concatena1 == conc[[i]])$correcta
+
+  lista2[[conc[[i]]]] <- map2(cpreg, correcta, 
+                                ~lista2[[conc[[i]]]] %>%
+                                  mutate(!!sym(paste0(.x, "r")) := f1(.data[[.x]], .y))) %>%
+    map2(.,  paste0(cpreg, "r"), ~select(.x, all_of(.y))) %>%
+    reduce(bind_cols) %>%
+    bind_cols(lista2[[conc[[i]]]], .)
+  
+}
 
 # (3) recodificar numero a etiqueta ----
 recfac_l <- matriz1_l %>%
   map2(preg_recod, ~filter(.x, cod_preg %in% .y)) %>%
   map(~mutate(.x, across(starts_with("Opcion"), ~str_split(.x, ";"))))
 
-for(i in 1:length(lista_numero)){ #i=4
+for(i in 1:length(lista2)){ #i=4
   for(j in 1:length(preg_recod[[i]])){ #j=34
     recfac_i <- recfac_l[[i]]
     var <- recfac_i$cod_preg[[j]] 
     etiq <- filter(recfac_i, cod_preg == var)
-    lista_numero[[i]][[var]] <- factor(lista_numero[[i]][[var]], unlist(etiq$OpcionN), unlist(etiq$OpcionL))  
+    lista2[[i]][[var]] <- factor(lista2[[i]][[var]], unlist(etiq$OpcionN), unlist(etiq$OpcionL))  
   }
 }
 
-#lista_numero[[6]] %>% View()
+#lista2[[2]] %>% View()
 
 devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/main/funciones/0-funciones-nuevas-22.R")
 
@@ -106,10 +170,11 @@ labels_l <- matriz1_l %>%
 labels_l <- labels_l %>%
   map_if(str_detect(names(.), "docente"), ~filter(.x, !str_detect(cod_preg, "p01")))
 
-lista3 <- map2(lista_numero, labels_l, ~asigna_label(.x, .y$label, .y$cod_preg))
+lista3 <- map2(lista2, labels_l, ~asigna_label(.x, .y$label, .y$cod_preg))
 lista3[[2]] %>% View()
 
 # (5) ajustar otras columnas  ----
+
 
 
 # (6) guardar las bases ! 

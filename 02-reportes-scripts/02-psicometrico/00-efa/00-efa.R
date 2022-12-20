@@ -40,15 +40,16 @@ nom <- names(matriz_lista) #para filtrar
 cargas_efa <- NULL
 indica_ajuste <- NULL
 prec <- map(lista, function(x) NULL)
+err <- map(lista, function(x) NULL)
 
-for(i in 1:length(nom)){ #i=2
+for(i in 1:length(nom)){ #i=5
   
   #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i' #
   matriz_i <- select(matriz_lista[[nom[i]]], cod_gen, cod_preg, Cod_indice, Enunciado, Constructo)
   vcod_indice <- unique(matriz_i$Cod_indice) #escalas del cuestionario i
   bd <- lista[[nom[i]]] #tomamos la base i
   
-  for(j in 1:length(vcod_indice)){ #j=1 #retire '1' porque no esta corriendo, luego vemos 
+  for(j in 1:length(vcod_indice)){ #j=1 
     
     #Rutina (puntajes e insumos RT) para la escala 'j' de la base 'i'
     escala_j <- filter(matriz_i, Cod_indice == vcod_indice[j])
@@ -69,12 +70,15 @@ for(i in 1:length(nom)){ #i=2
     #VSS
     nfac <- unclass(vss(bd1, fm = "wls", plot = FALSE, cor = "poly"))
     
-    #parallel analysis
+    
+    err[[i]][[vcod_indice[j]]]  <- tryCatch({ # para ver donde estan los warnings 
+    
+      #parallel analysis
     paralel <- fa.parallel(bd1, cor = "poly", fm = "wls", plot = FALSE)
     
-    # }, warning = function(w) print(w$message),
-    #   error = function(e) print(e$error)
-    # )
+    }, warning = function(w) print(w$message),
+       error = function(e) print(e$error)
+     )
     
     #indicadores de ajuste EFA y VSS, MAP
     indica_ajuste_pega <- data.frame(
@@ -116,7 +120,6 @@ for(i in 1:length(nom)){ #i=2
 }
 
 
-
 detalle <- data.frame(
   indicador = c("RMSEA (root mean squared error of approximation):", 
                 "SRMR (standardized root mean square residual):", 
@@ -147,10 +150,10 @@ rio::export(
 r <- here("02-reportes-scripts", "02-psicometrico", "00-efa", "01-genera-reporte-pdf.Rmd")
 rmarkdown::render(r, output_file = '01-efa-reporte', envir = new.env())
 
-
-
 # warnings ? 
-prec
+err %>%
+  flatten() %>%
+  View()
 
 
 

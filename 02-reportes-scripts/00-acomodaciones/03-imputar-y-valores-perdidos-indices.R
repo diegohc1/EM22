@@ -152,9 +152,8 @@ llavesl <- list(
   }
   
   final <- Sys.time()
-
+  final - inicio 
 }
-final - inicio 
 
 
 # guardamos!

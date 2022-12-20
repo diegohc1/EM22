@@ -20,7 +20,9 @@ lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01b-imputad
 lista2 <- lista %>%
   map(
     ~mutate(.x, across(where(is.factor), as.numeric.factor), #todo a numerico para el pca
-            maxedu = reduce(select(., c(edum, edup)), pmax)) #max educación padre y madre
+            maxedu = reduce(select(., c(edum, edup)), pmax), #max educación padre y madre
+            activo14_15 = ifelse(activo14 == 1 | activo15 == 1, 1, 0)
+            ) 
   )
 
 
@@ -32,14 +34,14 @@ for(i in 1:length(lista2)){ #i=1
   bd_list <- list(
     materiales_vivienda = select(bd, starts_with("mat")),
     servicios_basicos = select(bd, starts_with("serv")),
-    activos = select(bd, starts_with("activo")),
+    activos = select(bd, starts_with("activo"), -activo14, -activo15),
     otros_serv = select(bd, starts_with("oserv"))
   )
   
   pca_uno <- map(bd_list, ~pca_umc_reporte(.x, "poly"))
-  pca_uno <- map_df(pca_uno, 1)
+  pca_unop <- map_df(pca_uno, 1)
   
-  pca_dos <- bind_cols(bd, pca_uno) %>%
+  pca_dos <- bind_cols(bd, pca_unop) %>%
     select(maxedu, materiales_vivienda, servicios_basicos, activos, otros_serv) %>%
     pca_umc_reporte()
   
@@ -51,6 +53,20 @@ hist(pca_dos$puntajes)
 
 rio::export(bdfin, here("01-data", "03-intermedias", "02b-puntajes-ise",  "EM22_est2S_ise.rds"))
 # rio::export(bdfin, here("01-data", "03-intermedias", "02b-puntajes-ise", paste0(names(bd_complete_l[1]), "_ise.rds")))
+
+# ***********************
+
+show_in_excel <- function(.data){
+  tmp <- paste0(tempfile(), ".xlsx") 
+  rio::export(.data, tmp)
+  browseURL(url = tmp)
+} 
+
+
+map(pca_uno, "cargas") %>% 
+  bind_rows(.id = "indicador") %>%
+  show_in_excel()
+
 
 # #generar reporte en excel
 # 

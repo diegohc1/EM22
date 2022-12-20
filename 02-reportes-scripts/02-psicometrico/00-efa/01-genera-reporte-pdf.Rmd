@@ -87,6 +87,11 @@ for(i in 1:length(cods)){ #i=1
                   position = 'center', 
                   full_width = F,
                   font_size = 6) %>%
+        add_footnote(
+    c("RMSEA, SRMR: Un menor valor indica un mejor ajuste. Valores mayores a .10 se considera un ajuste pobre", 
+      "TLI: Un valor mayor a .90 indica un ajuste razonable y mayor a .95 un buen ajuste",
+      "VSS: Un mayor valor indica una mejor representación de una estructura simple",
+      "MAP: Un menor valor indica menores correlaciones parciales despues de extraer el factor, y un mejor ajuste")) %>%
     print()
   
    cat("\n\\newpage\n")

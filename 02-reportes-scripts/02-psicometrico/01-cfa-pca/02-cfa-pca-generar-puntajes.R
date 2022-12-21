@@ -49,7 +49,7 @@ puntajes <- map(lista, function(x) NULL)
 puntajes_lista <- NULL
 prec <- map(lista, function(x) NULL)
 
-quieres_puntajes <- FALSE
+quieres_puntajes <- TRUE
 
 # para seleccionar llaves
 llavesl <- list(
@@ -94,7 +94,7 @@ llavesl <- list(
       bd2 <- drop_na(bd1)
       bd3 <- bd2[preg$cod_preg] 
       
-     prec[[i]][[j]]  <- tryCatch({ # para ver donde estan los warnings ! 
+     #prec[[i]][[j]]  <- tryCatch({ # para ver donde estan los warnings ! 
        
       # Corremos el modelo según PCA o CFA
       if(tipo[j] == "PCA"){ 
@@ -103,8 +103,8 @@ llavesl <- list(
         mod <- acomoda_string_lavaan(preg)
         resultados1 <- cfa_recursivo(bd3, model_lavaan = mod, recursivo = FALSE, puntajes = quieres_puntajes)
       }
-        }, warning = function(w) print(w$message)
-      )
+      #  }, warning = function(w) print(w$message)
+      #)
       
       if(quieres_puntajes != FALSE){
         if(tipo[j] == "PCA"){ #nombre a la columna generada con PCA

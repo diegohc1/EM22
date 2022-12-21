@@ -13,7 +13,7 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-# params = list(cuest = "EM2022_2Sdirector_EBR")
+# params = list(cuest = "EM2022_2SdocenteCOM_EBR")
 
 library(here)
 library(dplyr)
@@ -24,6 +24,15 @@ files <- list.files(
   path = here("02-reportes-scripts", "01-descriptivos", "figuras-para-reportes", "00-nacional"),
   #pattern = "*.pdf",
   full.names = TRUE)
+
+# *~~~~~
+# cambio para docente
+# a miras de que se pueda visualizar la respuesta correcta 
+demate <- c("p08", "p10", "p11", "p12", "p13", "p14", "p15", "p16", "p17")
+tab_final2 <- tab_final2 %>%
+  mutate(cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteCOM_EBR" & cod_gen == "p14", cod_preg, cod_gen),
+         cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteMAT_EBR" & cod_gen %in% demate, cod_preg, cod_gen))
+# *~~~~~
 
 bd <- filter(tab_final2, estrato == "General") %>%
   mutate(rut = paste0(Concatena1, "_", cod_gen))
@@ -52,7 +61,7 @@ bd <- bd[which(bd$Concatena1 == params$cuest), ]
 
 nom <- unique(bd$Concatena1)
 
-for(i in 1:length(nom)){#i=1
+for(i in 1:length(nom)){#i=2
   
   cat('\n')
   cat("# ", unique(bd$Instrumento)[i], "\n") #nombre instrumento
@@ -63,7 +72,7 @@ for(i in 1:length(nom)){#i=1
   gg <- unique(bd_i$rut)
   files_i <- files[stringr::str_detect(files, nom[i])]
   
-  for(j in 1:length(files_i)){ #j=1
+  for(j in 1:length(files_i)){ #j=12
     
   bd_ij <- filter(bd_i, rut == gg[j])
   

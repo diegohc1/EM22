@@ -53,7 +53,7 @@ llavesl <- list(
 
 {
   inicio <- Sys.time()
-  for(i in 1:length(nom)){ #i=1
+  for(i in 1:length(nom)){ #i=3
     
     #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i'
     matriz_i <- matriz_lista[[nom[i]]]
@@ -61,7 +61,7 @@ llavesl <- list(
     
     bd <- lista[[nom[i]]] #tomamos la base i
     
-    for(j in 1:length(vcod_indice)){ #j=2
+    for(j in 1:length(vcod_indice)){ #j=1
       
       #Rutina para la escala 'j' de la base 'i'
       escala_j <- matriz_i[which(matriz_i$Cod_indice == vcod_indice[j]), ]

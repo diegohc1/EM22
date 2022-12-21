@@ -21,7 +21,7 @@ library(tidyverse)
 
 # bases de datos 
 lista = rio::import_list(Sys.glob(here("01-data", "01-depuradas", "*.sav")))
-lista$EM2022_2Sdirector_EBR$p06
+
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
 
@@ -106,13 +106,15 @@ lista2$EM2022_2SdocenteCYT_EBR <- lista2$EM2022_2SdocenteCYT_EBR %>% mutate(p04 
 # lista2$EM2022_4PdocenteCOM_EBR <- lista2$EM2022_4PdocenteCOM_EBR %>% mutate(p05 = ifelse(p04 == 1, 1, p05))
 
 # si no enseñas ciencia, para otra oportunidad 
-lista2$EM2022_2SdocenteCYT_EBR <- lista2$EM2022_2SdocenteCYT_EBR %>%
-  mutate(temp = case_when(
-    p06_01 == 1 & p06_02 == 1 & p06_03 == 1 & p06_04 == 1 & p06_05 == 1 & p06_06 == 1 & p06_07 == 2 ~ "seva",
-    TRUE ~ NA_character_)) %>%
-  filter(temp == "seva") %>%
-  select(-temp)
+vct <- c("p06_01", "p06_02", "p06_03", "p06_04", "p06_05", "p06_06")
 
+lista2$EM2022_2SdocenteCYT_EBR <- lista2$EM2022_2SdocenteCYT_EBR %>%
+  mutate(temp = ifelse(if_all(all_of(vct), ~.x == 1), 1, 0),
+         temp2 = ifelse(temp == 1 & p06_07 == 2, 1, 0)) %>%
+  filter(temp2 != 1) %>%
+  select(-temp, -temp2)
+
+           
 # estudiante ****
 # no puedes repetir si nunca lo has hecho
 lista2$EM2022_2Sestudiante_EBRD1 <- lista2$EM2022_2Sestudiante_EBRD1 %>%
@@ -124,11 +126,11 @@ claves <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8f
 f1 <- function(p, c){ifelse(p == c, 1, 0)} # funcion de ayuda
 
 conc <- unique(claves$Concatena1)
-for(i in 1:2){# i=1
+for(i in 1:2){# i=2
   cpreg <- filter(claves, Concatena1 == conc[[i]])$cod_preg
   correcta <- filter(claves, Concatena1 == conc[[i]])$correcta
 
-  lista2[[conc[[i]]]] <- map2(cpreg, correcta, 
+  lista2[[conc[[i]]]] <- aa <- map2(cpreg, correcta, 
                                 ~lista2[[conc[[i]]]] %>%
                                   mutate(!!sym(paste0(.x, "r")) := f1(.data[[.x]], .y))) %>%
     map2(.,  paste0(cpreg, "r"), ~select(.x, all_of(.y))) %>%

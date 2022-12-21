@@ -26,17 +26,26 @@ load(file = here("02-reportes-scripts", "01-descriptivos", "01-descriptivos-ffaa
 tabla <- tab_final2
 tabla1 <- filter(tabla, estrato == "General")
 
+# cambio para docente
+# a miras de que se pueda visualizar la respuesta correcta 
+demate <- c("p08", "p10", "p11", "p12", "p13", "p14", "p15", "p16", "p17")
+
+tabla1 <- tabla1 %>%
+  mutate(cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteCOM_EBR" & cod_gen == "p14", cod_preg, cod_gen),
+         cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteMAT_EBR" & cod_gen %in% demate, cod_preg, cod_gen))
+
 
 #para ordenar factores en el grafico
 # se desordena todo cuando hay opciones que nadie marcó o por alguna cuestion inexplicable 
 # nos aseguramos colocando nuevamente los labels 
 levels_factor <- tabla1 %>%
-  select(Concatena1, cod_gen, OpcionL) %>% 
+  select(Concatena1, cod_gen, OpcionL) %>%
   distinct(Concatena1, cod_gen, .keep_all = T) %>%
   mutate(labelf = strsplit(as.character(OpcionL), ";")) %>%
-  unnest(labelf) %>% 
-  select(Concatena1, cod_gen, labelf) 
+  unnest(labelf) %>%
+  select(Concatena1, cod_gen, labelf)
 
+# levels_factor %>% View()
 
 # (1) generamos graficos -----
 
@@ -44,12 +53,12 @@ nom <- unique(tabla1$Concatena1)
 
 # (1.1) graficos de barras, un solo item ----
 
-for(i in 1:length(nom)){ #i=1
+for(i in 1:length(nom)){ #i=2
   
   bd <- filter(tabla1, Concatena1 == nom[i], TipoV == "Categorico1", estrato == "General")
   vars1 <- unique(bd$cod_preg)
   
-  for(j in 1:length(vars1)){ #j=1
+  for(j in 1:length(vars1)){ #j=6
     
     levf <- filter(levels_factor, Concatena1 == nom[i], cod_gen == vars1[j])$labelf
     
@@ -105,12 +114,14 @@ for(i in 1:length(nom)){ #i=1
 
 # (1.2) graficos de barras, varios item ----
 
-for(i in 1:length(nom)){ #i=2
+for(i in 1:length(nom)){ #i=4
   
   bd <- filter(tabla1, Concatena1 == nom[i], TipoV == "Categorico2", estrato == "General")
   vars1 <- unique(bd$cod_gen)
   
-  for(j in 1:length(vars1)){ #j=6
+  if(length(vars1) == 0) break
+  
+  for(j in 1:length(vars1)){ #j=1
     
     levf <- filter(levels_factor, Concatena1 == nom[i], cod_gen == vars1[j])$labelf
     

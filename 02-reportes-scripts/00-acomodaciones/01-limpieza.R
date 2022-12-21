@@ -48,7 +48,7 @@ matriz1_l <- matriz1_l[names(lista)]
 preg_recod <- map(matriz1_l, ~filter(.x, !is.na(OpcionN)) %>% pull(cod_preg))
 
 # como estan? 
-map(1:length(lista), ~sapply(lista[[.x]][preg_recod[[.x]]], table))
+# map(1:length(lista), ~sapply(lista[[.x]][preg_recod[[.x]]], table))
 
 # (1) recodificar letra a numero ----
 
@@ -171,7 +171,7 @@ labels_l <- labels_l %>%
   map_if(str_detect(names(.), "docente"), ~filter(.x, !str_detect(cod_preg, "p01")))
 
 lista3 <- map2(lista2, labels_l, ~asigna_label(.x, .y$label, .y$cod_preg))
-lista3[[2]] %>% View()
+# lista3[[2]] %>% View()
 
 # (5) ajustar otras columnas  ----
 

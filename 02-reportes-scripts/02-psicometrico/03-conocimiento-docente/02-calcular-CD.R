@@ -6,7 +6,6 @@ rm(list = ls())
 # Conocimiento pedagogico (CP) -> calcular
 # *****************************************************************************************************************************
 
-
 library(tidyverse)
 library(here)
 library(rio)
@@ -14,11 +13,6 @@ library(lavaan)
 devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/main/funciones/0-funciones-nuevas-22.R")
 source(here("00-insumos", "0-funciones-apoyo.R"))
 as.numeric.factor <- function(x) as.numeric(levels(x))[x]
-
-#cargamos resultados descriptivos
-load(file = here("02-reportes-scripts", "01-descriptivos", "01-descriptivos-ffaa.Rdata"))
-tdesc <- tab_final2[which(tab_final2$estrato == "General"), ]
-tdesc <- mutate(tdesc, prop = round(prop, 1)) #redondeamos
 
 # Generar excel con los indicadores de ajuste y las cargas factoriales #
 
@@ -38,6 +32,8 @@ bdcom <- lista$EM2022_2SdocenteCOM_EBR_CD # base
 matriz_cfa_com <- matriz_cfa %>%
   filter(Cod_indice == "DOC2SLEC_CODIDR") %>%
   mutate(cod_preg = paste0(cod_preg, "r"))
+
+tabla_freq_columnas_dplyr(bdcom, matriz_cfa_com$cod_preg)
 
 mod <- acomoda_string_lavaan(matriz_cfa_com)
 

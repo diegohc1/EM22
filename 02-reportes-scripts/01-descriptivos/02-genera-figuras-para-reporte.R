@@ -105,12 +105,12 @@ for(i in 1:length(nom)){ #i=1
 
 # (1.2) graficos de barras, varios item ----
 
-for(i in 1:length(nom)){ #i=4
+for(i in 1:length(nom)){ #i=2
   
   bd <- filter(tabla1, Concatena1 == nom[i], TipoV == "Categorico2", estrato == "General")
   vars1 <- unique(bd$cod_gen)
   
-  for(j in 1:length(vars1)){ #j=4
+  for(j in 1:length(vars1)){ #j=6
     
     levf <- filter(levels_factor, Concatena1 == nom[i], cod_gen == vars1[j])$labelf
     

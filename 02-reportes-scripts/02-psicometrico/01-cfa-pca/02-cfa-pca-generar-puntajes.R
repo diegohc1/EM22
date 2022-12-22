@@ -21,7 +21,7 @@ tdesc <- mutate(tdesc, prop = round(prop, 1)) #redondeamos
 # Generar excel con los indicadores de ajuste y las cargas factoriales #
 
 # cargamos y acomodamos datos **********************
-lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01-imputadas", "*.rds")))
+lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01a-imputadas", "*.rds")))
 
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
@@ -61,7 +61,7 @@ llavesl <- list(
 
 {
   inicio <- Sys.time()
-  for(i in 1:length(nom)){ #i=2
+  for(i in 1:length(nom)){ #i=1
     
     #Preparamos los insumos/variables para la rutina de la base/cuestionario 'i'
     matriz_i <- select(matriz_lista[[nom[i]]], starts_with(c("cod", "Cod")), Analisis2, Enunciado, Constructo, sub_escala)
@@ -94,7 +94,7 @@ llavesl <- list(
       bd2 <- drop_na(bd1)
       bd3 <- bd2[preg$cod_preg] 
       
-     #prec[[i]][[j]]  <- tryCatch({ # para ver donde estan los warnings ! 
+     prec[[i]][[j]]  <- tryCatch({ # para ver donde estan los warnings ! 
        
       # Corremos el modelo según PCA o CFA
       if(tipo[j] == "PCA"){ 
@@ -103,8 +103,8 @@ llavesl <- list(
         mod <- acomoda_string_lavaan(preg)
         resultados1 <- cfa_recursivo(bd3, model_lavaan = mod, recursivo = FALSE, puntajes = quieres_puntajes)
       }
-      #  }, warning = function(w) print(w$message)
-      #)
+        }, warning = function(w) print(w$message)
+      )
       
       if(quieres_puntajes != FALSE){
         if(tipo[j] == "PCA"){ #nombre a la columna generada con PCA
@@ -163,7 +163,7 @@ if(quieres_puntajes != FALSE){
   scale2 <- function(x) (x - mean(x, na.rm = TRUE))/sd(x, na.rm = TRUE)
   puntajes_lista <- map2(puntajes_lista, nomcol, ~mutate(.x, across(all_of(.y), ~scale2(.x))))
   
-  rio::export_list(puntajes_lista, here("01-data", "03-intermedias", "02-puntajes-factoriales", paste0(names(lista), ".rds")))
+  rio::export_list(puntajes_lista, here("01-data", "03-intermedias", "02a-puntajes-factoriales", paste0(names(lista), ".rds")))
 }
 
 

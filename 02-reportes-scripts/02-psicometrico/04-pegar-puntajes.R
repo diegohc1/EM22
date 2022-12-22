@@ -10,7 +10,7 @@ source(here("00-insumos", "0-funciones-apoyo.R"))
 
 # (1) pegar puntajes factoriales 
 # puntajes de escalas
-lista_p = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "02-puntajes-factoriales", "*.rds"))) 
+lista_p = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "02a-puntajes-factoriales", "*.rds"))) 
 
 # retirar estas columnas de las bases para no duplicar
 retirar <- list(
@@ -44,13 +44,10 @@ lista_ise[[1]] <- lista_ise[[1]] %>% select(ID, -all_of(retirar$fam), ise2S)
 lista_f$EM2022_2Sestudiante_EBRD1 <- left_join(lista_f$EM2022_2Sestudiante_EBRD1, lista_ise[[1]], by = "ID")
 lista_f$EM2022_2Sestudiante_EBRD2 <- left_join(lista_f$EM2022_2Sestudiante_EBRD2, lista_ise[[1]], by = "ID")
 
-lista_f$EM2022_2Sestudiante_EBRD2 %>% View()
-
 # exportamos todo:
 
 rio::export_list(lista_f, here("01-data", "04-para-el-analisis", paste0(names(lista_f), ".sav")))
 
-# aqui tambien deberiamos pegar el ISE tambien! 
 
 
 

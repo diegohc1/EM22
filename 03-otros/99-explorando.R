@@ -8,7 +8,7 @@ l <- list(1, 2, "a", 3, -1, 100)
 
 # para el loop 
 g <- list()
-for(i in 1:length(l)){
+for(i in 1:length(l)){ #i=3
   g[[i]] <- log(l[[i]])
 }
 
@@ -16,9 +16,7 @@ for(i in 1:length(l)){
 g <- list()
 for(i in 1:length(l)){
   
-  tryCatch({
-    g[[i]] <- log(l[[i]])
-    }, error = function(e) print(e$message))
+  tryCatch({g[[i]] <- log(l[[i]])}, error = function(e) print(e$message))
   
 }
 

@@ -9,7 +9,6 @@ rm(list = ls())
 library(tidyverse)
 library(here)
 library(rio)
-library(googlesheets4)
 devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/main/funciones/0-funciones-nuevas-22.R")
 as.numeric.factor <- function(x) as.numeric(levels(x))[x]
 
@@ -48,6 +47,8 @@ for(i in 1:length(lista2)){ #i=1
   bdfin <- bind_cols(bd, ise2S = pca_dos$puntajes)
   
 }
+
+lmer(ise2S ~ 1 + (1|cod_mod7), data = bdfin) %>% calc_icc()
 
 hist(pca_dos$puntajes)
 
@@ -100,5 +101,49 @@ pca_dos$cargas
 # 
 
 
+# ***************************************************************
+
+bd19 <- rio::import("D:/1. UMC/2022/2-exploración-ise/ECE22_ise_LIMA.xlsx")
+bd19 <- select(bd19, cod_mod7, ise2S) %>% mutate(a = 2019)
+
+bd22 <- select(bdfin, cod_mod7, ise2S) %>% mutate(a = 2022)
+
+bb <- bind_rows(bd19, bd22)
+
+bb2 <- bb %>%
+  group_by(a, cod_mod7) %>%
+  summarise(mean1 = mean(ise2S, na.rm = TRUE),
+            nn = n()) %>%
+  arrange(cod_mod7)
+
+ggplot(bb2, aes(x = a, y = mean1, gt)) + 
+  geom_line(aes(group = as.factor(cod_mod7))) + 
+  geom_point() 
+
+ggplot(bb2, aes(mean1)) + 
+  geom_density(aes(color = as.factor(a)))
+
+padron <- rio::import("D:/1. UMC/2023/00-padron/Padron_web.dbf")
+names(padron)
+padron2 <- select(padron, cod_mod7 = COD_MOD, D_GESTION)
+
+bb3 <- left_join(bb2, padron2, by = "cod_mod7")
+
+bb3 <- mutate(bb3, gestion = ifelse(D_GESTION == "Privada", "Privada", "Publica"))
+
+table(bb3$a, bb3$gestion)
+
+library(lme4)
+dfest <- left_join(bb, padron2, by = "cod_mod7")
+dfest <- mutate(dfest, gestion = ifelse(D_GESTION == "Privada", "Privada", "Publica"))
+
+
+lmer(ise2S ~ 1 + (1|cod_mod7), data = filter(dfest, a == 2019)) %>% calc_icc()
+lmer(ise2S ~ 1 + (1|cod_mod7), data = filter(dfest, a == 2019, gestion == "Privada")) %>% calc_icc()
+lmer(ise2S ~ 1 + (1|cod_mod7), data = filter(dfest, a == 2019, gestion == "Publica")) %>% calc_icc()
+
+lmer(ise2S ~ 1 + (1|cod_mod7), data = filter(dfest, a == 2022)) %>% calc_icc()
+lmer(ise2S ~ 1 + (1|cod_mod7), data = filter(dfest, a == 2019, gestion == "Privada")) %>% calc_icc()
+lmer(ise2S ~ 1 + (1|cod_mod7), data = filter(dfest, a == 2019, gestion == "Publica")) %>% calc_icc()
 
 

@@ -14,7 +14,7 @@ lista = rio::import_list(Sys.glob(here("01-data", "04-para-el-analisis", "*.sav"
 bd <- lista$EM2022_2Sestudiante_EBRD2
 vv <- names(bd)[startsWith(names(bd), "EST")]
 
-lmer(ise2S~1 + (1|cod_mod7), data = bd1) %>% calc_icc()
+# lmer(ise2S~1 + (1|cod_mod7), data = bd1) %>% calc_icc()
 
 bd %>%
   select(all_of(vv), ise2S) %>%
@@ -38,6 +38,35 @@ lmer(EST2SLEC_ACTREFL~1 + (1|cod_mod7), data = bd1) %>% calc_icc()
 lmer(EST2SMAT_DISRP~1 + (1|cod_mod7), data = bd1) %>% calc_icc()
 lmer(EST2SMAT_ACTCOG~1 + (1|cod_mod7), data = bd1) %>% calc_icc()
 lmer(EST2SMAT_EVFORM~1 + (1|cod_mod7), data = bd1) %>% calc_icc()
+
+# ICC(1)
+icc1 <- lmer(EST2SMAT_DISRP~1 + (1|cod_mod7), data = bd1) %>% calc_icc()
+
+# ICC(2)
+k <- bd1 %>%
+  group_by(cod_mod7) %>%
+  mutate(n = n()) %%
+
+k <- mean(bdfinal$n)
+# k*ICC(1) / 1 + (k-1)*ICC
+icc2 <- k*icc1 / (1 + (k - 1)*icc1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

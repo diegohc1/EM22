@@ -84,9 +84,14 @@ df <- left_join(bdie, bddoc, by = "cor_minedu")
 
 # esta bien pegado, mal pegado? para el martes! 
 df %>%
-  select(isep, starts_with("EST"), starts_with("DOC")) %>%
+  select(isep,  starts_with("DOC")) %>%
   cor2()
 
+lm(DOC2SGEN_BURN2~isep, data = df) %>% summary()
+lm(DOC2SLEC_CLCOAPR ~isep, data = df) %>% summary()
+lm(DOC2SLEC_CLCOTN ~isep, data = df) %>% summary()
+lm(DOC2SGEN_PERTECNEG ~isep, data = df) %>% summary()
+lm(DOC2SGEN_PERTECPOS ~isep, data = df) %>% summary()
 
 # confiabilidad de variables de nivel 2 reportadas en nivel 1 ----
 

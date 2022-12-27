@@ -12,6 +12,10 @@ devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/
 lista = rio::import_list(Sys.glob(here("01-data", "04-para-el-analisis", "*.sav")))
 
 bd <- lista$EM2022_2Sestudiante_EBRD2
+temp <- select(bd, cod_mod7, cor_minedu, cor_est, ise2S)
+rio::export(temp, "EST2S_ISE_LIMA-preliminar.sav")
+
+
 bdlm <- filter(bd, !provincia %in% c("HUAROCHIRÍ", "CANTA"))
 
 unique(bd$provincia)
@@ -51,7 +55,7 @@ bb3$ise2S <- attr(bb3$ise2S, "ISE")
 
 bb3 %>%
   group_by(gestion) %>%
-  select(ise2S, starts_with("EST")) %>%
+  select(starts_with("EST")) %>%
   summarise(across(everything(), mean, na.rm = TRUE)) %>%
   pivot_longer(-gestion, names_to = "var", values_to = "est") %>%
   ggplot(aes(x = var, y = est, color = gestion)) + 
@@ -68,6 +72,7 @@ bb3 %>%
   ggplot(aes(x = var, y = est, color = gestion)) + 
   geom_point(size = 4)
 
+# ***********************************************************
 
 # pegado con docente ------ 
 
@@ -93,6 +98,8 @@ lm(DOC2SLEC_CLCOTN ~isep, data = df) %>% summary()
 lm(DOC2SGEN_PERTECNEG ~isep, data = df) %>% summary()
 lm(DOC2SGEN_PERTECPOS ~isep, data = df) %>% summary()
 
+# ********************************************************************
+
 # confiabilidad de variables de nivel 2 reportadas en nivel 1 ----
 
 bd1 <- bd %>%
@@ -116,8 +123,51 @@ k <- bd1 %>%
 # k*ICC(1) / 1 + (k-1)*ICC
 (icc2 <- k*icc1 / (1 + (k - 1)*icc1))
 
+# ***********************************************************************
 
+# grafico ise ----
 
+dist <- bdlm %>%
+  count(distritoX) %>%
+  arrange(-n) %>%
+  pull(distritoX) 
+
+dist <- dist[1:26]
+
+tab1 <- bdlm %>%
+  filter(distritoX %in% dist) %>%
+  group_nest(distritoX) %>%
+  mutate(m1 = map(data, ~lm(EST2SLEC_ESTLEC~ise2S, data = .x))) %>%
+  mutate(coef1 = map(m1, ~coef(.x)[2]),
+         pval = map(m1, ~coef(summary(.x))[2, 4])) %>%
+  mutate(coef1 = unlist(coef1),
+         pval = unlist(pval))
+
+tab2 <- tab1 %>%
+  mutate(coef1 = round(coef1, 2),
+         coef2 = ifelse(pval < 0.05, paste0(coef1, "*"), coef1),
+         coef3 = ifelse(pval < 0.05, coef1, 0)) %>%
+  select(distritoX, coef1, coef2, coef3)
+
+ggplot(tab2, aes(x = distritoX, y = coef1)) + 
+  geom_col() + 
+  coord_flip(y = c(-.20, 0.60)) + 
+  theme_bw() + 
+  geom_text(aes(label = coef2), hjust = -0.2)
+  theme()
+  
+tab2 %>%
+    #mutate(var = fct_reorder(var, est, .desc = FALSE)) %>%
+    mutate(est = ifelse(pval > 0.05, 0, est)) %>%
+    ggplot(aes(x = fct_rev(var), y = est)) + 
+    geom_bar(stat = 'identity', fill = "#6BAED6", width = 0.7) +
+    coord_flip(y = c(0, 30)) +
+    theme_bw() +
+    theme(axis.ticks = element_blank(),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(),
+          panel.grid.major.y = element_blank(),
+          axis.text.y = element_text(size = 11))
 
 
 # Perfil latente 

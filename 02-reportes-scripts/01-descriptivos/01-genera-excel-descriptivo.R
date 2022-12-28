@@ -14,9 +14,13 @@ library(here)
 devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/main/funciones/0-funciones-nuevas-22.R")
 source(here("00-insumos", "0-funciones-apoyo.R"))
 
+padron <- rio::import("D:/1. UMC/2023/00-padron/Padron_web.dbf")
+padron2 <- select(padron, cod_mod7 = COD_MOD, D_GESTION)
+padron2 <- mutate(padron2, gestion = ifelse(D_GESTION == "Privada", "Privada", "Publica")) %>% select(-D_GESTION)
 
 # (0) importamos bases de datos ----
-lista = rio::import_list(Sys.glob(here("01-data", "02-con-etiquetas", "*.sav"))) %>% map(factorize)
+lista = rio::import_list(Sys.glob(here("01-data", "02-con-etiquetas", "*.sav"))) %>% map(rio::factorize)
+lista <- map(lista, ~left_join(.x, padron2, by = "cod_mod7"))
   
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
@@ -49,15 +53,15 @@ tab_general <- tab_general |>
   bind_rows(.id = "Concatena1") |>
   mutate(estrato = "General", tipo = "Nacional")
 
-# por gestion ****
-# tab_gestion <- map2(lista, lista_vars, 
-#                     ~group_by(.x, gestion2) |> 
-#                       tabla_freq_columnas_dplyr(nomvar = .y))
-# 
-# tab_gestion <- tab_gestion |>
-#   bind_rows(.id = "Concatena2") |>
-#   rename(estrato = gestion2) |>
-#   mutate(tipo = "Gestion")
+#por gestion ****
+tab_gestion <- map2(lista, lista_vars,
+                    ~group_by(.x, gestion) |>
+                      tabla_freq_columnas_dplyr(nomvar = .y))
+
+tab_gestion <- tab_gestion |>
+  bind_rows(.id = "Concatena1") |>
+  rename(estrato = gestion) |>
+  mutate(tipo = "Gestion")
 # 
 # # por region ****
 # tab_region <- map2(lista, lista_vars, 
@@ -70,9 +74,7 @@ tab_general <- tab_general |>
 #   mutate(tipo = "Region")
 # 
 # # juntamos los resultados
-# tab_final <- bind_rows(tab_general, tab_gestion, tab_region) |> rename(cod_preg = var)
-
-tab_final <- tab_general|> rename(cod_preg = var)
+tab_final <- bind_rows(tab_general, tab_gestion) |> rename(cod_preg = var)
 
 # pegar con la info de la matriz
 tab_final2 <- left_join(tab_final, matriz_pegar, by = c("Concatena1", "cod_preg"))

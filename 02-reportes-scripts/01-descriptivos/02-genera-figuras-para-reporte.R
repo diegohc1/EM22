@@ -24,7 +24,9 @@ acomoda_poslabel <- function(data, freq, xn){
 load(file = here("02-reportes-scripts", "01-descriptivos", "01-descriptivos-ffaa.Rdata"))
 
 tabla <- tab_final2
-tabla1 <- filter(tabla, estrato == "General")
+#unique(tabla$estrato)
+tabla1 <- filter(tabla, estrato == "Publica")
+head(tabla)
 
 # cambio para docente
 # a miras de que se pueda visualizar la respuesta correcta 
@@ -55,10 +57,10 @@ nom <- unique(tabla1$Concatena1)
 
 for(i in 1:length(nom)){ #i=2
   
-  bd <- filter(tabla1, Concatena1 == nom[i], TipoV == "Categorico1", estrato == "General")
+  bd <- filter(tabla1, Concatena1 == nom[i], TipoV == "Categorico1")
   vars1 <- unique(bd$cod_preg)
   
-  for(j in 1:length(vars1)){ #j=6
+  for(j in 1:length(vars1)){ #j=1
     
     levf <- filter(levels_factor, Concatena1 == nom[i], cod_gen == vars1[j])$labelf
     
@@ -116,7 +118,7 @@ for(i in 1:length(nom)){ #i=2
 
 for(i in 1:length(nom)){ #i=4
   
-  bd <- filter(tabla1, Concatena1 == nom[i], TipoV == "Categorico2", estrato == "General")
+  bd <- filter(tabla1, Concatena1 == nom[i], TipoV == "Categorico2")
   vars1 <- unique(bd$cod_gen)
   
   if(length(vars1) == 0) break

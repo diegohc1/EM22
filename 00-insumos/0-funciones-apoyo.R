@@ -34,7 +34,13 @@ chequeo <- function(mc){
   
 }
 
-
+# para ver si hay duplicados segun algun id 
+dupli <- function(data, id){
+  nr <- data.frame(table(data[[id]]))
+  idrep <- nr[nr$Freq > 1,]
+  cuantosrep <- table(nr$Freq)
+  return(list(id = idrep, freq = cuantosrep))
+}
 
 
 #***********************************************************************************************

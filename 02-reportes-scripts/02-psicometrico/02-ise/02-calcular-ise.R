@@ -14,6 +14,16 @@ as.numeric.factor <- function(x) as.numeric(levels(x))[x]
 
 #bases
 lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01b-imputadas-ise", "*.rds"))) 
+aa <- lista[[1]]
+
+# quedarnos con LIMA 
+d <- Sys.glob(here("01-data", "02-con-etiquetas", "*.sav"))
+temp <- rio::import(d[5])
+temp <- select(temp, cod_mod7, provinciaX) %>% distinct(cod_mod7, .keep_all = TRUE)
+temp %>% count(provinciaX)
+
+lista[[1]] <- left_join(lista[[1]], temp, by = "cod_mod7")
+lista[[1]] <- filter(lista[[1]], !provinciaX %in% c("CANTA", "HUAROCHIRÍ"))
 
 # Acomodaciones finales para el PCA
 lista2 <- lista %>%
@@ -48,11 +58,21 @@ for(i in 1:length(lista2)){ #i=1
   
 }
 
-lmer(ise2S ~ 1 + (1|cod_mod7), data = bdfin) %>% calc_icc()
+# lme4::lmer(ise2S ~ 1 + (1|cod_mod7), data = bdfin) %>% calc_icc()
 
 hist(pca_dos$puntajes)
+bdfin
+length(unique(bdfin$ID))
+bdfin <- mutate(bdfin, id2 = paste0(cor_minedu, cor_est))
+length(unique(bdfin$id2))
+n_occur <- data.frame(table(bdfin$id2))
+n_occur[n_occur$Freq > 1,]
 
 rio::export(bdfin, here("01-data", "03-intermedias", "02b-puntajes-ise",  "EM22_est2S_ise.rds"))
+rio::export(bdfin, here("01-data", "03-intermedias", "02b-puntajes-ise",  "EM22_est2S_ise.sav"))
+bdfin2 <- select(bdfin, ID, cod_mod7, cor_minedu, cor_est, ise2S)
+rio::export(bdfin2, here("01-data", "03-intermedias", "02b-puntajes-ise",  "EM22_est2S_ise.sav"))
+
 # rio::export(bdfin, here("01-data", "03-intermedias", "02b-puntajes-ise", paste0(names(bd_complete_l[1]), "_ise.rds")))
 
 # ***********************

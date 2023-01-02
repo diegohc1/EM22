@@ -47,6 +47,17 @@ matriz1_l <- matriz1_l[names(lista)]
 # preguntas para recod
 preg_recod <- map(matriz1_l, ~filter(.x, !is.na(OpcionN)) %>% pull(cod_preg))
 
+# repetidos? 
+# estudiante 
+est <- lista$EM2022_2Sestudiante_EBRD1
+est <- lista$EM2022_2Sestudiante_EBRD2
+est <- mutate(est, id2 = paste0(cor_minedu, cor_est))
+est <- select(est, cor_minedu, cor_est, id2)
+dupli(est, "id2")
+
+doc <- lista$EM2022_2SdocenteCOM_EBR
+dupli(doc, "cor-minedu")
+
 # como estan? 
 # map(1:length(lista), ~sapply(lista[[.x]][preg_recod[[.x]]], table))
 

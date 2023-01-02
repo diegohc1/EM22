@@ -23,6 +23,8 @@ d <- d[str_detect(d, paste(bdise, collapse = "|"))]
 
 lista = rio::import_list(d) %>% set_names(bdise[1])
 
+dd <- lista[[1]]
+
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
 matriz_ise <- filter(matriz, str_detect(Cod_indice, "ISE"))

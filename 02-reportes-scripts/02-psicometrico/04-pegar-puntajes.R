@@ -38,11 +38,12 @@ matriz_vs_lista(names(lista), names(lista_p))
 # puntajes a la base
 llave <- c("ID")
 lista_f <- map2(lista, lista_p, ~left_join(.x, .y, by = llave))
+map(lista_f, names)
 
 # cambiamos nombre en las de estudiante para no estar con .x o .y
 lista_f <- lista_f %>%
   map_if(str_detect(names(.), "est"), 
-         ~select(.x, -cor_minedu.y, cor_est.y) %>%
+         ~select(.x, -cor_minedu.y, -cor_est.y) %>%
            rename(cor_minedu = cor_minedu.x, cor_est = cor_est.x))
 
 # (2) pegamos el ISE al estudiante/familia

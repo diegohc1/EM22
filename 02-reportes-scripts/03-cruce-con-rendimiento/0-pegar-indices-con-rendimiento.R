@@ -30,8 +30,14 @@ lista_f1 <- lista_f %>%
 # 2S
 s2 <- keep(lista_f1, str_detect(names(lista_f1), "2S"))
 names(s2)
-llaves <- list(dir = "cod_mod7", docc = "cor_minedu", docct = "cor_minedu",  
-               est = c("cor_minedu", "cor_est"), est = c("cor_minedu", "cor_est"))
+map(s2, names)
+
+llaves <- list(dir = "cod_mod7", 
+               docc = "cor_minedu", 
+               docct = "cor_minedu",  
+               est = c("cor_minedu", "cor_est"), 
+               est = c("cor_minedu", "cor_est")
+               )
 
 rend2sl <- map2(s2, llaves, ~left_join(lista_rend[[1]], .x, by = .y))
 

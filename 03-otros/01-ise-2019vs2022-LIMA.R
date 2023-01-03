@@ -1,4 +1,7 @@
 
+
+library(tidyverse)
+
 bd <- rio::import("C:/Users/factoresasociados03/Desktop/explora-ise-19vs22-lima.xlsx")
 bd
 

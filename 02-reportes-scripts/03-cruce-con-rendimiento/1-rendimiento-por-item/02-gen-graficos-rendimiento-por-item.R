@@ -1,0 +1,104 @@
+
+rm(list = ls())
+
+library(tidyverse)
+library(here)
+
+str_wrap_factor <- function(x, ...) {
+  levels(x) <- str_wrap(levels(x), ...)
+  x
+}
+
+theme1 <- theme(legend.position = "none", 
+                #axis.text.y = element_blank(), 
+                axis.ticks = element_blank(),
+                axis.text.x = element_text(size = 8.1, color = "black"),
+                plot.margin = unit(c(.3, .3, .3, .3), "cm"),
+                panel.grid = element_blank())
+
+load(here("02-reportes-scripts", "03-cruce-con-rendimiento", "1-rendimiento-por-item", "01-rend-por-item.Rdata"))
+# proms <- rio::import(here("3-reportes", "3-cruces-rendimiento", "00-rendimiento-promedio.xlsx"))
+
+# cambio para docente
+# a miras de que se pueda visualizar la respuesta correcta 
+demate <- c("p08", "p10", "p11", "p12", "p13", "p14", "p15", "p16", "p17")
+
+tablafinal3 <- tablafinal3 %>%
+  mutate(cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteCOM_EBR" & cod_gen == "p14", cod_preg, cod_gen))#,
+         #cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteMAT_EBR" & cod_gen %in% demate, cod_preg, cod_gen))
+
+#para ordenar factores en el grafico
+# se desordena todo cuando hay opciones que nadie marcó o por alguna cuestion inexplicable 
+# nos aseguramos colocando nuevamente los labels 
+levels_factor <- tablafinal3 %>%
+  select(Concatena1, cod_gen, OpcionL) %>% 
+  distinct(Concatena1, cod_gen, .keep_all = T) %>%
+  mutate(labelf = strsplit(as.character(OpcionL), ";")) %>%
+  unnest(labelf) %>% 
+  select(Concatena1, cod_gen, labelf) 
+
+
+tablafinal3 <- tablafinal3 %>%
+  filter(estrato == "General") %>%
+  mutate(media = round(media, 1))
+
+
+cuest <- unique(tablafinal3$Concatena1)
+rends <- unique(tablafinal3$rend)
+carpeta <- c("lec2s", "mat2s", "cyt2s")
+
+for(r in 1:length(rends)){ #r=1
+  
+  tabla_r <- filter(tablafinal3, rend == rends[r])
+  cuest <- unique(tabla_r$Concatena1)
+  
+  for(i in 1:length(cuest)){ #i=1
+    
+    tabla_ri <- filter(tabla_r, Concatena1 == cuest[i])
+    pregs <- unique(tabla_ri$cod_preg)
+    mini <- min(tabla_ri$media)
+    maxi <- max(tabla_ri$media)
+    
+    #param <- filter(proms, Concatena1 == rends[r])
+    
+    for(j in 1:length(pregs)){ #j=1
+      
+      tabla_rij <- filter(tabla_ri, cod_preg == pregs[j])
+      codo <- tabla_rij$cod_gen #para filtrar en levels_factor
+      levf <- filter(levels_factor, Concatena1 == cuest[i], cod_gen == codo)$labelf
+      
+      tabla_rij <- mutate(tabla_rij, opcion = factor(opcion, levels = levf, labels = levf))
+      tabla_rij <- mutate(tabla_rij, opcion = str_wrap_factor(opcion, 25))
+      
+      tabla_rij <- mutate(tabla_rij, 
+                          preg = ifelse(TipoV == "Categorico2", paste0(Pregunta,  "\n", Enunciado), Pregunta)) %>%
+        mutate(preg = str_wrap(preg, 80))
+      
+      tit <- unique(tabla_rij$preg)
+      
+      gg1 <- tabla_rij %>%
+        ggplot(aes(x = opcion, y = media)) + 
+        #geom_hline(yintercept = param$mean1, linetype = 2, color = "gray") +
+        #geom_hline(yintercept = param$low, linetype = 3, color = "gray") +
+        #geom_hline(yintercept = param$hig, linetype = 3, color = "gray") +
+        geom_point(size = 2) + 
+        geom_text(aes(label = format(round(media), decimal.mark = ",")), hjust = -0.3, size = 4) +
+        geom_text(aes(label = paste0("(", format(prop, decimal.mark = ","), ")")), vjust = 2.2, size = 3.1) +
+        theme_bw() + labs(x = "", y = "", title = tit) + 
+        theme(title = element_text(size = 8)) +
+        theme1 + 
+        coord_cartesian(ylim = c(mini + 10, maxi + 10)) 
+      
+      
+      ff <- paste0(cuest[i], "_", pregs[j], "_", rends[r])
+      ruta <- here("02-reportes-scripts", "03-cruce-con-rendimiento", 
+                   "1-rendimiento-por-item", "02-figuras", carpeta[r], paste0(ff, ".png"))
+      
+      ggsave(ruta, gg1, w =  8.572917, h = 4.906250)    
+      
+    }
+  }
+}
+
+warnings()
+

@@ -55,7 +55,7 @@ ise_recod <- ise_recod[names(lista)]
 # nos quedamos con las variables 
 lista_ise <- lista %>%
   map2(., vars_ise, 
-       ~select(.x, ID, cod_mod7, anexo, cor_minedu, dsc_seccion_imp, cor_est, all_of(.y)) %>%
+       ~select(.x, ID, cod_mod7, anexo, cor_minedu, cor_est, all_of(.y)) %>%
          mutate(across(all_of(.y), as.numeric)))
 
 
@@ -160,7 +160,7 @@ for(i in 1:length(nom)){ #i=1
   meth <- dry$method
   
   #excluir de la prediccion : 
-  pred[, c("ID", 'cod_mod7', 'anexo', 'dsc_seccion_imp', 'cor_est')] <- 0 
+  pred[, c("ID", 'cod_mod7', 'anexo', "cor_minedu",  'cor_est')] <- 0 
   
   meth #ver que tienen el metodo correcto, sino editamos
   vise <- vars_ise[[nom[i]]]

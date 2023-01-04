@@ -3,7 +3,7 @@
 # *****************************************************************************************************************************
 # Limpieza de bases de datos -> 
 # *****************************************************************************************************************************
-
+# 🛁
 # Este script realiza una serie de acomodaciones iniciales para el uso de las bases de datos de FFAA
 
 # (1) recodificar letra a número 

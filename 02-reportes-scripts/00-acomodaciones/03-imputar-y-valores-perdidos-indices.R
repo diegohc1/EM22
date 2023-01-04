@@ -47,8 +47,8 @@ inspeccion_correlaciones_lista <- map(lista, function(x) NULL)
 
 llavesl <- list(
   dir = c("ID", "cod_mod7", "anexo"), 
-  doc = c("ID", "cod_mod7", "anexo", "cor_minedu", "dsc_seccion"), 
-  fam = c("ID", "cod_mod7", "anexo", "cor_minedu", "dsc_seccion_imp", "cor_est")
+  doc = c("ID", "cod_mod7", "anexo", "cor_minedu"), 
+  fam = c("ID", "cod_mod7", "anexo", "cor_minedu", "cor_est")
 )
 
 {
@@ -159,7 +159,7 @@ llavesl <- list(
 # guardamos!
 
 # bases imputadas
-rio::export_list(datos_imputados_lista, here("01-data", "03-intermedias", "01-imputadas", paste0(names(lista), ".rds")))
+rio::export_list(datos_imputados_lista, here("01-data", "03-intermedias", "01a-imputadas", paste0(names(lista), ".rds")))
 
 # reporte de missing de las escalas
 export(tabla_info_missing_pegar, here("02-reportes-scripts", "00-acomodaciones", "03-valores-perdidos-indices.xlsx"))

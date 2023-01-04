@@ -1,6 +1,6 @@
 Mplus VERSION 7.2
 MUTHEN & MUTHEN
-01/04/2023  11:04 AM
+01/04/2023  12:37 PM
 
 INPUT INSTRUCTIONS
 
@@ -10,23 +10,23 @@ INPUT INSTRUCTIONS
   FILE = "D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/02-modelos-ffaa/mods/mlm.dat"
 
   VARIABLE:
-  NAMES = M500_EM_2S_2022_CT Peso_lectura peso_ie cod_mod7 ise2S isep;
+  NAMES = M500_EM_2S_2022_MA Peso_mate peso_ie cod_mod7 isep disrp;
    MISSING=.;
    CLUSTER = cod_mod7;
-  WEIGHT = Peso_lectura;
+  WEIGHT = Peso_mate;
   BWEIGHT  = peso_ie;
   WTSCALE  = CLUSTER;
   BWTSCALE = SAMPLE;
-  USEVARIABLES = M500_EM_2S_2022_CT ise2S isep;
-  WITHIN = ise2S;
-  BETWEEN = isep;
+  USEVARIABLES = M500_EM_2S_2022_MA  disrp isep;
+  WITHIN = ;
+  BETWEEN = disrp isep;
   ANALYSIS:
   type = TWOLEVEL;
   MODEL:
   %WITHIN%
-  M500_EM_2S_2022_CT on ise2S;
+  M500_EM_2S_2022_MA on ;
   %BETWEEN%
-  M500_EM_2S_2022_CT on isep;
+  M500_EM_2S_2022_MA on disrp isep;
 
 
 
@@ -36,11 +36,7 @@ INPUT INSTRUCTIONS
 *** WARNING in VARIABLE command
   Note that only the first 8 characters of variable names are used in the output.
   Shorten variable names to avoid any confusion.
-*** WARNING
-  Data set contains cases with missing on x-variables.
-  These cases were not included in the analysis.
-  Number of cases with missing on x-variables:  1270
-   3 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+   2 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
 
 
 
@@ -50,7 +46,7 @@ Modelo XXX;
 SUMMARY OF ANALYSIS
 
 Number of groups                                                 1
-Number of observations                                       14030
+Number of observations                                       10935
 
 Number of dependent variables                                    1
 Number of independent variables                                  2
@@ -62,21 +58,18 @@ Observed dependent variables
    M500_EM_2S
 
 Observed independent variables
-   ISE2S       ISEP
+   DISRP       ISEP
 
 Variables with special functions
 
   Cluster variable      COD_MOD7
   Weight variable (cluster-size scaling)
-    PESO_LEC
+    PESO_MAT
   Between weight variable (sample-size scaling)
     PESO_IE
 
-  Within variables
-   ISE2S
-
   Between variables
-   ISEP
+   DISRP       ISEP
 
 
 Estimator                                                      MLR
@@ -102,16 +95,16 @@ Input data format  FREE
 SUMMARY OF DATA
 
      Number of missing data patterns             1
-     Number of clusters                        253
+     Number of clusters                        185
 
-     Average cluster size       55.455
+     Average cluster size       59.108
 
      Estimated Intraclass Correlations for the Y Variables
 
                 Intraclass
      Variable  Correlation
 
-     M500_EM_     0.114
+     M500_EM_     0.116
 
 
 
@@ -124,10 +117,10 @@ Minimum covariance coverage value   0.100
 
 
            Covariance Coverage
-              M500_EM_      ISE2S         ISEP
+              M500_EM_      DISRP         ISEP
               ________      ________      ________
  M500_EM_       1.000
- ISE2S          1.000         1.000
+ DISRP          1.000         1.000
  ISEP           1.000         1.000         1.000
 
 
@@ -142,18 +135,18 @@ Number of Free Parameters                        5
 
 Loglikelihood
 
-          H0 Value                      -76695.633
-          H0 Scaling Correction Factor      2.6328
+          H0 Value                      -64093.709
+          H0 Scaling Correction Factor      2.2818
             for MLR
-          H1 Value                      -76695.633
-          H1 Scaling Correction Factor      2.6328
+          H1 Value                      -64093.709
+          H1 Scaling Correction Factor      2.2818
             for MLR
 
 Information Criteria
 
-          Akaike (AIC)                  153401.266
-          Bayesian (BIC)                153439.011
-          Sample-Size Adjusted BIC      153423.122
+          Akaike (AIC)                  128197.419
+          Bayesian (BIC)                128233.917
+          Sample-Size Adjusted BIC      128218.028
             (n* = (n + 2) / 24)
 
 Chi-Square Test of Model Fit
@@ -180,7 +173,7 @@ CFI/TLI
 
 Chi-Square Test of Model Fit for the Baseline Model
 
-          Value                             86.742
+          Value                             44.502
           Degrees of Freedom                     2
           P-Value                           0.0000
 
@@ -198,32 +191,30 @@ MODEL RESULTS
 
 Within Level
 
- M500_EM_2S ON
-    ISE2S              3.920      0.978      4.007      0.000
-
- Residual Variances
-    M500_EM_2S      3171.164     70.558     44.944      0.000
+ Variances
+    M500_EM_2S      6992.984    151.867     46.047      0.000
 
 Between Level
 
  M500_EM_2S ON
-    ISEP              22.468      2.816      7.978      0.000
+    DISRP             -5.902      6.633     -0.890      0.374
+    ISEP              32.710      4.306      7.596      0.000
 
  Intercepts
-    M500_EM_2S       603.304      1.629    370.394      0.000
+    M500_EM_2S       588.254      2.462    238.909      0.000
 
  Residual Variances
-    M500_EM_2S       242.061     34.210      7.076      0.000
+    M500_EM_2S       524.730     74.979      6.998      0.000
 
 
 QUALITY OF NUMERICAL RESULTS
 
-     Condition Number for the Information Matrix              0.831E-04
+     Condition Number for the Information Matrix              0.180E-04
        (ratio of smallest to largest eigenvalue)
 
 
-     Beginning Time:  11:04:26
-        Ending Time:  11:04:26
+     Beginning Time:  12:37:27
+        Ending Time:  12:37:27
        Elapsed Time:  00:00:00
 
 

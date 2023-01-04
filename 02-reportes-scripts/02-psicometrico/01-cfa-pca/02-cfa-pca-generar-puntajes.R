@@ -54,8 +54,8 @@ quieres_puntajes <- TRUE
 # para seleccionar llaves
 llavesl <- list(
   dir = c("ID", "cod_mod7", "anexo"), 
-  doc = c("ID", "cod_mod7", "anexo", "cor_minedu", "dsc_seccion"), 
-  fam = c("ID", "cod_mod7", "anexo", "cor_minedu", "dsc_seccion_imp", "cor_est")
+  doc = c("ID", "cod_mod7", "anexo", "cor_minedu"), 
+  fam = c("ID", "cod_mod7", "anexo", "cor_minedu", "cor_est")
 )
 
 
@@ -81,7 +81,7 @@ llavesl <- list(
       ll <- llavesl[[3]]
     }
     
-    for(j in 1:length(vcod_indice)){ #j=3
+    for(j in 1:length(vcod_indice)){ #j=2
       
       #Rutina para la escala 'j' de la base 'i'
       escala_j <- matriz_i[which(matriz_i$Cod_indice == vcod_indice[j]), ]
@@ -94,7 +94,7 @@ llavesl <- list(
       bd2 <- drop_na(bd1)
       bd3 <- bd2[preg$cod_preg] 
       
-     prec[[i]][[j]]  <- tryCatch({ # para ver donde estan los warnings ! 
+     #prec[[i]][[j]]  <- tryCatch({ # para ver donde estan los warnings ! 
        
       # Corremos el modelo según PCA o CFA
       if(tipo[j] == "PCA"){ 
@@ -103,8 +103,8 @@ llavesl <- list(
         mod <- acomoda_string_lavaan(preg)
         resultados1 <- cfa_recursivo(bd3, model_lavaan = mod, recursivo = FALSE, puntajes = quieres_puntajes)
       }
-        }, warning = function(w) print(w$message)
-      )
+      #  }, warning = function(w) print(w$message)
+      #)
       
       if(quieres_puntajes != FALSE){
         if(tipo[j] == "PCA"){ #nombre a la columna generada con PCA
@@ -169,6 +169,8 @@ if(quieres_puntajes != FALSE){
 
 # guardamos insumos 
 save(ins, file = here("02-reportes-scripts", "02-psicometrico", "01-cfa-pca", "02-info-escalas-para-reporte.Rdata")) #guardamos
+
+# ***************
 
 matriz_cfa %>%
   distinct(Concatena1, Constructo, .keep_all = TRUE) %>%

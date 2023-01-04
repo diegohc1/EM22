@@ -54,8 +54,12 @@ lista_f$EM2022_2Sestudiante_EBRD1 <- left_join(lista_f$EM2022_2Sestudiante_EBRD1
 lista_f$EM2022_2Sestudiante_EBRD2 <- left_join(lista_f$EM2022_2Sestudiante_EBRD2, lista_ise[[1]], by = c("cor_minedu", "cor_est"))
 
 # exportamos todo:
-
 rio::export_list(lista_f, here("01-data", "04-para-el-analisis", paste0(names(lista_f), ".sav")))
+
+
+
+
+
 
 lmer(ise2S ~ 1 + (1|cod_mod7), data = lista_f$EM2022_2Sestudiante_EBRD1) %>% calc_icc()
 lmer(ise2S ~ 1 + (1|cod_mod7), data = lista_f$EM2022_2Sestudiante_EBRD2) %>% calc_icc()

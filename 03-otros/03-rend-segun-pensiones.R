@@ -39,6 +39,12 @@ names(em2s22)
 unique(em2s22$Provincia)
 unique(ece2s19$estrat03)
 
+ece2s19 %>%
+  filter(!estrat03 %in% c("Pública", "Rural")) %>%
+  group_by(estrat03) %>%
+  factorito::mean_prop_grupo("M500_CN") %>%
+  mutate(a = "2019")
+
 tab1 <- bind_rows(
   
   ece2s19 %>%
@@ -55,6 +61,7 @@ tab1 <- bind_rows(
 )
 
 tab1 <- tab1 %>% filter(estrat03 != "Rural")
+tab1 <- tab1 %>% filter(estrat03 %in% c("Pública", "Rural"))
 
 ggplot(tab1, aes(x = estrat03, y = media, color = a)) + 
   geom_point(size = 4.5) + 

@@ -24,18 +24,35 @@ ise <- rio::import(here("01-data", "03-intermedias", "02b-puntajes-ise",  "FFAA-
 bd <- left_join(bdrend, ise, by = c("año", "cor_minedu", "cor_est"))
 
 
-filter(bd, año == "2022") %>%
-  mutate(qise = ntile(ise2S_19_22, 4)) %>%
-  group_by(qise) %>%
-  drop_na(Peso_lectura) %>%
-  factorito::mean_prop_grupo("M500_L", "Peso_lectura") %>%
+tab1 <- bind_rows(
   
-
-filter(bd, año == "2019") %>%
+  filter(bd, año == "2022") %>%
+    mutate(qise = ntile(ise2S_19_22, 4)) %>%
+    group_by(qise) %>%
+    drop_na(Peso_CN) %>%
+    factorito::mean_prop_grupo("M500_CN", "Peso_CN") %>%
+    mutate(a = "2022"),
+  
+  
+  filter(bd, año == "2019") %>%
   mutate(qise = ntile(ise2S_19_22, 4)) %>%
   group_by(qise) %>%
   #drop_na(Peso_lectura) %>%
-  factorito::mean_prop_grupo("M500_L")
+  factorito::mean_prop_grupo("M500_CN") %>%
+  mutate(a = "2019")
+)
+
+ggplot(tab1, aes(x = as.factor(qise), y = media, color = a)) + 
+  geom_point(size = 4.5) + 
+  theme_bw() +
+  theme(legend.title = element_blank(),
+        axis.text.x = element_text(size = 12),
+        legend.text = element_text(size = 11),
+        legend.position = "bottom") + 
+  labs(x = "\nCuartil del índice socioecónomico (Lima y Callao)", 
+       y = "Rendimiento promedio\n") + 
+  geom_text(aes(label = format(round(media), decimal.mark = ",")), 
+            hjust = -0.3, size = 5, color = "black")
 
 
 tab2 <- bind_cols(

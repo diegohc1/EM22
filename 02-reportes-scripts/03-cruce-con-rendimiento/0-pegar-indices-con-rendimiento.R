@@ -15,6 +15,8 @@ names(lista_rend[[1]])
 
 lista_f = rio::import_list(Sys.glob(here("01-data", "04-para-el-analisis", "*.sav"))) %>% map(rio::factorize)
 
+
+
 # quedemos con las variables 
 lista_f1 <- lista_f %>%
   map(~select(.x, cod_mod7, starts_with("cor"), 
@@ -34,7 +36,8 @@ map(s2, names)
 
 llaves <- list(dir = "cod_mod7", 
                docc = "cor_minedu", 
-               docct = "cor_minedu",  
+               docct = "cor_minedu",
+               docm = "cor_minedu",
                est = c("cor_minedu", "cor_est"), 
                est = c("cor_minedu", "cor_est")
                )

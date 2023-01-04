@@ -1,52 +1,46 @@
-Mplus VERSION 7
+Mplus VERSION 7.2
 MUTHEN & MUTHEN
-12/30/2022   8:24 AM
+01/04/2023  11:04 AM
 
 INPUT INSTRUCTIONS
 
   TITLE:
   Modelo XXX;
   DATA:
-  FILE = "D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/2-modelos-ffaa/mods/mlm.dat";
+  FILE = "D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/02-modelos-ffaa/mods/mlm.dat"
 
   VARIABLE:
-  NAMES = M500_EM_2S_2022_MA Peso_mate peso_ie cod_mod7 EST2SMAT_AUTOEF;
+  NAMES = M500_EM_2S_2022_CT Peso_lectura peso_ie cod_mod7 ise2S isep;
    MISSING=.;
    CLUSTER = cod_mod7;
-  WEIGHT = Peso_mate;
+  WEIGHT = Peso_lectura;
   BWEIGHT  = peso_ie;
   WTSCALE  = CLUSTER;
   BWTSCALE = SAMPLE;
-  USEVARIABLES = M500_EM_2S_2022_MA EST2SMAT_AUTOEF ;
-  WITHIN = EST2SMAT_AUTOEF;
-  BETWEEN = ;
+  USEVARIABLES = M500_EM_2S_2022_CT ise2S isep;
+  WITHIN = ise2S;
+  BETWEEN = isep;
   ANALYSIS:
   type = TWOLEVEL;
   MODEL:
   %WITHIN%
-  M500_EM_2S_2022_MA on EST2SMAT_AUTOEF;
+  M500_EM_2S_2022_CT on ise2S;
   %BETWEEN%
-  M500_EM_2S_2022_MA on ;
+  M500_EM_2S_2022_CT on isep;
 
 
 
 *** WARNING
-  Variable name contains more than 8 characters.
-  Only the first 8 characters will be printed in the output.
-  Variable: M500_EM_2S_2022_MA
-*** WARNING
-  Variable name contains more than 8 characters.
-  Only the first 8 characters will be printed in the output.
-  Variable: PESO_MATE
-*** WARNING
-  Variable name contains more than 8 characters.
-  Only the first 8 characters will be printed in the output.
-  Variable: EST2SMAT_AUTOEF
+  Input line exceeded 90 characters. Some input may be truncated.
+  FILE = "D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/02-modelos-ffaa/mods/mlm.dat";
+*** WARNING in VARIABLE command
+  Note that only the first 8 characters of variable names are used in the output.
+  Shorten variable names to avoid any confusion.
 *** WARNING
   Data set contains cases with missing on x-variables.
   These cases were not included in the analysis.
-  Number of cases with missing on x-variables:  654
-   4 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+  Number of cases with missing on x-variables:  1270
+   3 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
 
 
 
@@ -56,10 +50,10 @@ Modelo XXX;
 SUMMARY OF ANALYSIS
 
 Number of groups                                                 1
-Number of observations                                       14634
+Number of observations                                       14030
 
 Number of dependent variables                                    1
-Number of independent variables                                  1
+Number of independent variables                                  2
 Number of continuous latent variables                            0
 
 Observed dependent variables
@@ -68,18 +62,21 @@ Observed dependent variables
    M500_EM_2S
 
 Observed independent variables
-   EST2SMAT
+   ISE2S       ISEP
 
 Variables with special functions
 
   Cluster variable      COD_MOD7
   Weight variable (cluster-size scaling)
-    PESO_MAT
+    PESO_LEC
   Between weight variable (sample-size scaling)
     PESO_IE
 
   Within variables
-   EST2SMAT
+   ISE2S
+
+  Between variables
+   ISEP
 
 
 Estimator                                                      MLR
@@ -98,7 +95,7 @@ Convergence criterion for H1                             0.100D-03
 Optimization algorithm                                         EMA
 
 Input data file(s)
-  D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/2-modelos-ffaa/mods/mlm.d
+  D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/02-modelos-ffaa/mods/mlm.
 Input data format  FREE
 
 
@@ -107,14 +104,14 @@ SUMMARY OF DATA
      Number of missing data patterns             1
      Number of clusters                        253
 
-     Average cluster size       57.842
+     Average cluster size       55.455
 
      Estimated Intraclass Correlations for the Y Variables
 
                 Intraclass
      Variable  Correlation
 
-     M500_EM_     0.103
+     M500_EM_     0.114
 
 
 
@@ -127,10 +124,11 @@ Minimum covariance coverage value   0.100
 
 
            Covariance Coverage
-              M500_EM_      EST2SMAT
-              ________      ________
+              M500_EM_      ISE2S         ISEP
+              ________      ________      ________
  M500_EM_       1.000
- EST2SMAT       1.000         1.000
+ ISE2S          1.000         1.000
+ ISEP           1.000         1.000         1.000
 
 
 
@@ -140,27 +138,27 @@ THE MODEL ESTIMATION TERMINATED NORMALLY
 
 MODEL FIT INFORMATION
 
-Number of Free Parameters                        4
+Number of Free Parameters                        5
 
 Loglikelihood
 
-          H0 Value                      -84628.399
-          H0 Scaling Correction Factor      2.7671
+          H0 Value                      -76695.633
+          H0 Scaling Correction Factor      2.6328
             for MLR
-          H1 Value                      -84628.394
-          H1 Scaling Correction Factor      2.7671
+          H1 Value                      -76695.633
+          H1 Scaling Correction Factor      2.6328
             for MLR
 
 Information Criteria
 
-          Akaike (AIC)                  169264.798
-          Bayesian (BIC)                169295.162
-          Sample-Size Adjusted BIC      169282.450
+          Akaike (AIC)                  153401.266
+          Bayesian (BIC)                153439.011
+          Sample-Size Adjusted BIC      153423.122
             (n* = (n + 2) / 24)
 
 Chi-Square Test of Model Fit
 
-          Value                              0.009*
+          Value                              0.001*
           Degrees of Freedom                     0
           P-Value                           0.0000
           Scaling Correction Factor         1.0000
@@ -182,8 +180,8 @@ CFI/TLI
 
 Chi-Square Test of Model Fit for the Baseline Model
 
-          Value                            609.718
-          Degrees of Freedom                     1
+          Value                             86.742
+          Degrees of Freedom                     2
           P-Value                           0.0000
 
 SRMR (Standardized Root Mean Square Residual)
@@ -201,29 +199,32 @@ MODEL RESULTS
 Within Level
 
  M500_EM_2S ON
-    EST2SMAT_A        31.381      1.072     29.274      0.000
+    ISE2S              3.920      0.978      4.007      0.000
 
  Residual Variances
-    M500_EM_2S      5909.252    116.600     50.680      0.000
+    M500_EM_2S      3171.164     70.558     44.944      0.000
 
 Between Level
 
- Means
-    M500_EM_2S       592.221      2.640    224.300      0.000
+ M500_EM_2S ON
+    ISEP              22.468      2.816      7.978      0.000
 
- Variances
-    M500_EM_2S       796.712    124.969      6.375      0.000
+ Intercepts
+    M500_EM_2S       603.304      1.629    370.394      0.000
+
+ Residual Variances
+    M500_EM_2S       242.061     34.210      7.076      0.000
 
 
 QUALITY OF NUMERICAL RESULTS
 
-     Condition Number for the Information Matrix              0.900E-03
+     Condition Number for the Information Matrix              0.831E-04
        (ratio of smallest to largest eigenvalue)
 
 
-     Beginning Time:  08:24:14
-        Ending Time:  08:24:15
-       Elapsed Time:  00:00:01
+     Beginning Time:  11:04:26
+        Ending Time:  11:04:26
+       Elapsed Time:  00:00:00
 
 
 
@@ -236,4 +237,4 @@ Fax: (310) 391-8971
 Web: www.StatModel.com
 Support: Support@StatModel.com
 
-Copyright (c) 1998-2012 Muthen & Muthen
+Copyright (c) 1998-2014 Muthen & Muthen

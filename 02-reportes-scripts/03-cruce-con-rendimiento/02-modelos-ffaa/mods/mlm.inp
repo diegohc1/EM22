@@ -1,23 +1,23 @@
 TITLE:
 Modelo XXX;
 DATA:
-FILE = "D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/2-modelos-ffaa/mods/mlm.dat";
+FILE = "D:/EM22/02-reportes-scripts/03-cruce-con-rendimiento/02-modelos-ffaa/mods/mlm.dat";
  
 VARIABLE:
-NAMES = M500_EM_2S_2022_MA Peso_mate peso_ie cod_mod7 EST2SMAT_AUTOEF; 
+NAMES = M500_EM_2S_2022_CT Peso_lectura peso_ie cod_mod7 ise2S isep; 
  MISSING=.;
  CLUSTER = cod_mod7;
-WEIGHT = Peso_mate;
+WEIGHT = Peso_lectura;
 BWEIGHT  = peso_ie;
 WTSCALE  = CLUSTER;
 BWTSCALE = SAMPLE;
-USEVARIABLES = M500_EM_2S_2022_MA EST2SMAT_AUTOEF ;
-WITHIN = EST2SMAT_AUTOEF;
-BETWEEN = ;
+USEVARIABLES = M500_EM_2S_2022_CT ise2S isep;
+WITHIN = ise2S;
+BETWEEN = isep;
 ANALYSIS:
 type = TWOLEVEL;
 MODEL:
 %WITHIN% 
-M500_EM_2S_2022_MA on EST2SMAT_AUTOEF; 
+M500_EM_2S_2022_CT on ise2S; 
 %BETWEEN% 
-M500_EM_2S_2022_MA on ;
+M500_EM_2S_2022_CT on isep;

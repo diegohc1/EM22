@@ -16,21 +16,21 @@ theme1 <- theme(legend.position = "none",
                 plot.margin = unit(c(.3, .3, .3, .3), "cm"),
                 panel.grid = element_blank())
 
-load(here("02-reportes-scripts", "03-cruce-con-rendimiento", "1-rendimiento-por-item", "01-rend-por-item.Rdata"))
+load(here("02-reportes-scripts", "03-cruce-con-rendimiento", "01-rendimiento-por-item", "01-rend-por-item.Rdata"))
 # proms <- rio::import(here("3-reportes", "3-cruces-rendimiento", "00-rendimiento-promedio.xlsx"))
 
 # cambio para docente
 # a miras de que se pueda visualizar la respuesta correcta 
 demate <- c("p08", "p10", "p11", "p12", "p13", "p14", "p15", "p16", "p17")
 
-tablafinal3 <- tablafinal3 %>%
-  mutate(cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteCOM_EBR" & cod_gen == "p14", cod_preg, cod_gen))#,
-         #cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteMAT_EBR" & cod_gen %in% demate, cod_preg, cod_gen))
+tabla_general3 <- tabla_general3 %>%
+  mutate(cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteCOM_EBR" & cod_gen == "p14", cod_preg, cod_gen),
+         cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteMAT_EBR" & cod_gen %in% demate, cod_preg, cod_gen))
 
 #para ordenar factores en el grafico
 # se desordena todo cuando hay opciones que nadie marcó o por alguna cuestion inexplicable 
 # nos aseguramos colocando nuevamente los labels 
-levels_factor <- tablafinal3 %>%
+levels_factor <- tabla_general3 %>%
   select(Concatena1, cod_gen, OpcionL) %>% 
   distinct(Concatena1, cod_gen, .keep_all = T) %>%
   mutate(labelf = strsplit(as.character(OpcionL), ";")) %>%
@@ -38,18 +38,28 @@ levels_factor <- tablafinal3 %>%
   select(Concatena1, cod_gen, labelf) 
 
 
-tablafinal3 <- tablafinal3 %>%
+tabla_general3 <- tabla_general3 %>%
   filter(estrato == "General") %>%
   mutate(media = round(media, 1))
 
 
-cuest <- unique(tablafinal3$Concatena1)
-rends <- unique(tablafinal3$rend)
+cuest <- unique(tabla_general3$Concatena1)
+rends <- unique(tabla_general3$rend)
 carpeta <- c("lec2s", "mat2s", "cyt2s")
+
+# crear carpeta 
+# [deberia usar esto mas seguido creo]
+rr <- here("01-data", "ZZ-rendimiento-por-item")
+#dir.create2 <- function(path) ifelse(!dir.exists(path), dir.create(path), "La carpeta ya existe!")
+#dir.create2(rr)
+
+# crear subcarpetas 
+#sapply(paste0(rr, "/", carpeta), dir.create2)
+
 
 for(r in 1:length(rends)){ #r=1
   
-  tabla_r <- filter(tablafinal3, rend == rends[r])
+  tabla_r <- filter(tabla_general3, rend == rends[r])
   cuest <- unique(tabla_r$Concatena1)
   
   for(i in 1:length(cuest)){ #i=1
@@ -91,8 +101,9 @@ for(r in 1:length(rends)){ #r=1
       
       
       ff <- paste0(cuest[i], "_", pregs[j], "_", rends[r])
-      ruta <- here("02-reportes-scripts", "03-cruce-con-rendimiento", 
-                   "1-rendimiento-por-item", "02-figuras", carpeta[r], paste0(ff, ".png"))
+      # ruta <- here("02-reportes-scripts", "03-cruce-con-rendimiento", 
+      #              "1-rendimiento-por-item", "02-figuras", carpeta[r], paste0(ff, ".png"))
+      ruta <- here("01-data", "ZZ-rendimiento-por-item", carpeta[r], paste0(ff, ".png"))
       
       ggsave(ruta, gg1, w =  8.572917, h = 4.906250)    
       

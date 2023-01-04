@@ -1,14 +1,16 @@
 # *****************************************************************************************************************************
 # Evaluación Muestral (EM) 22 
 # *****************************************************************************************************************************
-# # Modelos multinivel: estudiante y familia nivel 1 
+# # Modelos multinivel: estudiante nivel 2 
 # *****************************************************************************************************************************
 
+# 📈️
+
+rm(list = ls())
 library(here)
 library(tidyverse)
 library(MplusAutomation)
 # devtools::install_github("diegohc1/factorito")
-
 
 reg_mplus <- function(data, y, x1 = NULL, x2 = NULL, peso_est, idie){
   
@@ -58,8 +60,18 @@ mpluscoef <- function(mplus_salida) return(mplus_salida$results$parameters$unsta
 
 # y_ij = b0 + u_00 + b01*x_ij + e_ij
 
-load(here("01-data", "06-ffaa-con-rendimiento", "rend2s.Rdata"))
-names(rend2sl$EM2022_2Sestudiante_EBRD2)
+bd2s <- rio::import(here("01-data", "06-ffaa-con-rendimiento", "rend2s_indices.sav"))
+
+cor(bd2s$M500_EM_2S_2022_MA, bd2s$ise2S, use = "complete.obs")
+cor(bd2s$M500_EM_2S_2022_CT, bd2s$ise2S, use = "complete.obs")
+
+bd2s <- bd2s %>%
+  group_by(cod_mod7) %>%
+  mutate(disrp = mean(EST2SMAT_DISRP, na.rm = TRUE),
+         actcgogp = mean(EST2SMAT_ACTCOG, na.rm = TRUE),
+         evformp = mean(EST2SMAT_EVFORM, na.rm = TRUE))
+
+
 # mate 
 bd1 <- rend2sl$EM2022_2Sestudiante_EBRD2 %>%
   select(M500_EM_2S_2022_MA, Peso_mate, Peso_IE_mate, cod_mod7.x, starts_with("EST"), ise2S, Provincia) %>%

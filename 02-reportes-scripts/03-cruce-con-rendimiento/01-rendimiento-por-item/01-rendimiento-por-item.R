@@ -68,6 +68,7 @@ matriz_pegar <- bind_rows(matriz_lista) %>%
 lec2s <- rend2sl %>% map(~f1(.x, "lectura")) 
 mat2s <- rend2sl %>% map(~f1(.x, "mate")) 
 cyt2s <- rend2sl %>% map(~f1(.x, "ciencia")) 
+# map(lec2s, names)
 
 # 4P 
 
@@ -165,6 +166,26 @@ for(i in 1:length(vrend)){ # i=1
 }
 
 tabla_estrato1 <- bind_rows(tabla_estrato, .id = "rend")
+
+#le pegamos la info
+tabla_estrato2 <- left_join(tabla_estrato1, matriz_pegar, by = c("Concatena1", "cod_preg"))
+
+tabla_estrato3 <- tabla_estrato2 %>%
+  select(Instrumento, Concatena1, rend, gestion, cod_gen, 
+         cod_preg, Pregunta, Enunciado, opcion, n, prop, media, TipoV, OpcionL) %>%
+  mutate(media = round(media, 0))
+
+# en .rdata
+save(tabla_estrato3, file = here("02-reportes-scripts", "03-cruce-con-rendimiento", "01-rendimiento-por-item", "01-rend-por-item-gestion.Rdata"))
+
+# en .xlsx
+tabla_estrato3_excel <- tabla_estrato3 %>%
+  select(-TipoV, -OpcionL, -n) %>%
+  split(.$Concatena1) %>%
+  map(~pivot_wider(.x, names_from = rend, values_from = c(prop, media)))
+
+rio::export(tabla_estrato3_excel, here("02-reportes-scripts", "03-cruce-con-rendimiento", "01-rendimiento-por-item", "01-rend-por-item-gestion.xlsx"))
+
 
 
 # descriptivos segun sexo [solo estudiante]  ---- 

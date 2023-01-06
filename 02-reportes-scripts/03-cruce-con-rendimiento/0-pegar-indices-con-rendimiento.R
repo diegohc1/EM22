@@ -16,7 +16,6 @@ lista_rend = rio::import_list(Sys.glob(here("01-data", "05-bd-rendimiento", "*.s
 lista_f = rio::import_list(Sys.glob(here("01-data", "04-para-el-analisis", "*.sav"))) %>% map(rio::factorize)
 
 
-
 # quedemos con las variables 
 lista_f1 <- lista_f %>%
   map(~select(.x, cod_mod7, starts_with("cor"), 

@@ -12,14 +12,14 @@ unique(est19$provincia)
 # sentido de pertenencia ---- 
 
 # 2019: 
-# 24_01 Con frecuencia me aburro en el colegio
+# 24_01 Con frecuencia me aburro en el colegio *
 # 24_02: Mi colegio es un lugar donde me siento solo
 # 24_03: Prefiero faltar al colegio
 # 24_04: En el colegio me siento fuera de lugar
 # 24_05: Mi colegio es un lugar donde me siento como un extraño o dejado de lado
 
 # 2022
-# 15_01: Preferiría faltar al colegio.
+# 15_01: Preferiría faltar al colegio. *
 # 15_02: Mi colegio es un lugar donde me siento solo(a)
 # 15_03: Preferiría estudiar en otro colegio.
 # 15_04: En el colegio, me siento fuera de lugar
@@ -61,6 +61,26 @@ head(est19b)
 head(est22b)
 sapply(est19b, class)
 sapply(est22b, class)
+
+show_in_excel <- function(.data){
+  tmp <- paste0(tempfile(), ".xlsx")
+  rio::export(.data, tmp)
+  browseURL(url = tmp)
+}
+
+
+bd1 %>%
+  group_by(a) %>%
+  factorito::tablaf_col("p24", starts = TRUE) %>%
+  show_in_excel()
+
+bd1 %>%
+  group_by(a) %>%
+  factorito::tablaf_col("p24", starts = TRUE) %>%
+  ggplot(aes(x = var, y = prop, fill = as.factor(opcion))) + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~a) +
+  geom_text(aes(label = prop), position = position_dodge(width = 1), vjust = -0.5)
 
 # cfa 
 library(lavaan)

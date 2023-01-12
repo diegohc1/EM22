@@ -33,13 +33,12 @@ tab1 <- bind_rows(
     factorito::mean_prop_grupo("M500_CN", "Peso_CN") %>%
     mutate(a = "2022"),
   
-  
   filter(bd, año == "2019") %>%
-  mutate(qise = ntile(ise2S_19_22, 4)) %>%
-  group_by(qise) %>%
-  #drop_na(Peso_lectura) %>%
-  factorito::mean_prop_grupo("M500_CN") %>%
-  mutate(a = "2019")
+    mutate(qise = ntile(ise2S_19_22, 4)) %>%
+    group_by(qise) %>%
+    #drop_na(Peso_lectura) %>%
+    factorito::mean_prop_grupo("M500_CN") %>%
+    mutate(a = "2019")
 )
 
 ggplot(tab1, aes(x = as.factor(qise), y = media, color = a)) + 
@@ -60,14 +59,14 @@ tab2 <- bind_cols(
   filter(bd, año == "2022") %>%
     mutate(qise = ntile(ise2S_19_22, 4)) %>%
     group_by(qise) %>%
-    drop_na(Peso_lectura) %>%
-    factorito::mean_prop_grupo("M500_L", "Peso_lectura") %>%
+    drop_na(Peso_CN) %>%
+    factorito::mean_prop_grupo("M500_CN", "Peso_CN") %>%
     select(qise, media22 = media),
   
   filter(bd, año == "2019") %>%
     mutate(qise = ntile(ise2S_19_22, 4)) %>%
     group_by(qise) %>%
-    factorito::mean_prop_grupo("M500_L") %>%
+    factorito::mean_prop_grupo("M500_CN") %>%
     select(media19 = media)
 )
 
@@ -135,6 +134,7 @@ tab19 <- tab19 %>%
 
 
 m1 <- svyby(~M500_EM_2S_2022_CT, ~iseq, bd_lec_svy, svymean)
+
 tab22 <- as.data.frame(m1) %>%
   rename(qise = iseq, mean1 = M500_EM_2S_2022_CT) %>%
   mutate(año = "2022")

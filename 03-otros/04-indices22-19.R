@@ -118,7 +118,7 @@ temp %>% count(provinciaX)
 lista[[1]] <- left_join(lista[[1]], temp, by = "cod_mod7")
 bd22 <- filter(lista[[1]], !provinciaX %in% c("CANTA", "HUAROCHIRÍ"))
 names(bd22)
-bd22 <- select(bd22, cod_mod7, anexo, cor_minedu, cor_est, everything(), -dsc_seccion_imp, -provinciaX, -ID)
+bd22 <- select(bd22, cod_mod7, anexo, cor_minedu, cor_est, everything())
 bd22 <- bd22 %>%
   mutate(seccion = substr(cor_minedu, 7, 8),
          seccion = str_pad(seccion, 2, pad = "0"))%>% 
@@ -133,7 +133,7 @@ head(bd22)
 
 # 2019
 # ya esta solo con LIMA
-bd19 <- rio::import("D:/1. UMC/2022/2-exploracion-ise/bdlima2019-ise.sav")
+bd19 <- rio::import("D:/1. UMC/2022/2-exploración-ise/bdlima2019-ise.sav")
 bd19 <- mutate(bd19, a = "2019") %>% select(-nom_dre)
 
 ece19b <- select(ece19, cod_mod7, anexo, seccion = ID_Seccion, cor_est, cor_minedu)
@@ -147,9 +147,9 @@ sapply(bd19c, class)
 sapply(bd22, class)
 bdf <- bind_rows(bd22, bd19c)
 
-bdf %>%
+bdfb %>%
   group_by(a) %>%
-  summarise(across(starts_with("act"), ~round(mean(.x), 2)))
+  summarise(across(starts_with("maxedu"), ~round(mean(.x), 2)))
 
 # Acomodaciones finales para el PCA
 bdfb <- bdf %>%
@@ -161,9 +161,10 @@ bdfb <- bdf %>%
 bd_list <- list(
   materiales_vivienda = select(bdfb, starts_with("mat")),
   servicios_basicos = select(bdfb, starts_with("serv")),
-  #activos = select(bdfb, starts_with("activo"), -activo14, -activo15),
-  activos = select(bdfb, starts_with("activo"), -activo1, -activo5, -activo14, -activo15),
-  otros_serv = select(bdfb, starts_with("oserv"))
+  activos = select(bdfb, starts_with("activo"), -activo14, -activo15),
+  #activos = select(bdfb, starts_with("activo"), -activo1, -activo5, -activo14, -activo15),
+  #otros_serv = select(bdfb, starts_with("oserv"))
+  otros_serv = select(bdfb, starts_with("oserv"), -oserv1)
 )
 
 pca_uno <- map(bd_list, ~factorito::reporte_pca(.x, "poly"))
@@ -185,11 +186,21 @@ rio::export(bb, here("01-data", "03-intermedias", "02b-puntajes-ise",  "FFAA-ind
 
 
 
+dd <- import(here("01-data", "03-intermedias", "02b-puntajes-ise",  "FFAA-indices2019_2022.sav"))
+names(dd)
+ggplot(dd, aes(x = ise2S_19_22)) +  geom_density(size = 2)
+ggplot(dd, aes(x = ise2S_19_22, color = año)) +  
+  geom_density(size = 2) +
+  theme_bw() + 
+  theme(legend.title = element_blank(),
+        legend.position = "bottom")
 
+dd %>%
+  group_by(año) %>%
+  factorito::mean_prop_grupo("ise2S_19_22")
 
-
-
-
+(-0.0798) - 0.00799
+(-0.110) - 0.0111
 
 
 

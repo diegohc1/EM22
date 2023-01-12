@@ -26,7 +26,7 @@ temp %>% count(provinciaX)
 lista[[1]] <- left_join(lista[[1]], temp, by = "cod_mod7")
 bd22 <- filter(lista[[1]], !provinciaX %in% c("CANTA", "HUAROCHIRÍ"))
 names(bd22)
-bd22 <- select(bd22, cod_mod7, anexo, cor_minedu, cor_est, everything(), -dsc_seccion_imp, -provinciaX, -ID)
+bd22 <- select(bd22, cod_mod7, anexo, cor_minedu, cor_est, everything(), -provinciaX, -ID)
 bd22 <- bd22 %>%
   mutate(seccion = substr(cor_minedu, 7, 8),
          seccion = str_pad(seccion, 2, pad = "0"))%>% 
@@ -36,7 +36,7 @@ bd22 <- bd22 %>%
 
 # 2019
 # ya esta solo con LIMA
-bd19 <- rio::import("D:/1. UMC/2022/2-exploracion-ise/bdlima2019-ise.sav")
+bd19 <- rio::import("D:/1. UMC/2022/2-exploración-ise/bdlima2019-ise.sav")
 bd19 <- mutate(bd19, a = 2019) %>% select(-nom_dre)
 
 # juntamos 
@@ -56,7 +56,8 @@ bd_list <- list(
   servicios_basicos = select(bdfb, starts_with("serv")),
   #activos = select(bdfb, starts_with("activo"), -activo14, -activo15),
   activos = select(bdfb, starts_with("activo"), -activo1, -activo5, -activo14, -activo15),
-  otros_serv = select(bdfb, starts_with("oserv"))
+  #otros_serv = select(bdfb, starts_with("oserv")), 
+  otros_serv = select(bdfb, starts_with("oserv"), -oserv1)
 )
 
 pca_uno <- map(bd_list, ~factorito::reporte_pca(.x, "poly"))
@@ -79,12 +80,22 @@ bdfin <- mutate(bdfin, Peso_lectura = ifelse(a == 2019, 1, Peso_lectura))
 bdfin <- drop_na(bdfin, Peso_lectura)
 
 ggplot(bdfin, aes(ise2S, )) + geom_density()
-ggplot(bdfin, aes(ise2S)) + geom_density(aes(color = factor(a)))
+ggplot(bdfin, aes(ise2S)) + 
+  geom_density(aes(color = factor(a)), size = 2) + 
+  theme_bw() + 
+  theme(legend.title = element_blank(),
+        legend.position = "bottom")
+
+
+
 ggplot(bdfin, aes(ise2S, weight = Peso_lectura/sum(Peso_lectura))) + geom_density(aes(color = factor(a)))
 
 bdfin %>%
   group_by(a) %>%
   factorito::mean_prop_grupo("ise2S", w = "Peso_lectura")
+
+(-0.0907) - 0.0111
+(-0.0445) - 0.00653
 
 ggplot(bdfin, aes(ise2S)) + 
   geom_histogram()

@@ -17,7 +17,7 @@ devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/
 source(here("00-insumos", "0-funciones-apoyo.R"))
 
 # cargamos y acomodamos datos **********************
-lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01-imputadas", "*.rds")))
+lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01a-imputadas", "*.rds")))
 
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")

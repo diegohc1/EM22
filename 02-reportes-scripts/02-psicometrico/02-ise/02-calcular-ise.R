@@ -17,13 +17,13 @@ lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01b-imputad
 aa <- lista[[1]]
 
 # quedarnos con LIMA 
-d <- Sys.glob(here("01-data", "02-con-etiquetas", "*.sav"))
-temp <- rio::import(d[5])
-temp <- select(temp, cod_mod7, provinciaX) %>% distinct(cod_mod7, .keep_all = TRUE)
-temp %>% count(provinciaX)
+# d <- Sys.glob(here("01-data", "02-con-etiquetas", "*.sav"))
+# temp <- rio::import(d[5])
+# temp <- select(temp, cod_mod7, provinciaX) %>% distinct(cod_mod7, .keep_all = TRUE)
+# temp %>% count(provinciaX)
 
-lista[[1]] <- left_join(lista[[1]], temp, by = "cod_mod7")
-lista[[1]] <- filter(lista[[1]], !provinciaX %in% c("CANTA", "HUAROCHIRÍ"))
+# lista[[1]] <- left_join(lista[[1]], temp, by = "cod_mod7")
+# lista[[1]] <- filter(lista[[1]], !provinciaX %in% c("CANTA", "HUAROCHIRÍ"))
 
 # Acomodaciones finales para el PCA
 lista2 <- lista %>%
@@ -67,6 +67,8 @@ for(i in 1:length(lista2)){ #i=1
 # n_occur <- data.frame(table(bdfin$id2))
 # n_occur[n_occur$Freq > 1,]
 
+ggplot(bdfin, aes(ise2S)) +  geom_density(size = 2)
+
 rio::export(bdfin, here("01-data", "03-intermedias", "02b-puntajes-ise",  "EM22_est2S_ise.rds"))
 # rio::export(bdfin, here("01-data", "03-intermedias", "02b-puntajes-ise",  "EM22_est2S_ise.sav"))
 
@@ -81,11 +83,12 @@ show_in_excel <- function(.data){
 } 
 
 
-map(pca_uno, "cargas") %>% 
+map(pca_uno, "indicadores") %>% 
   bind_rows(.id = "indicador") %>%
   show_in_excel()
 
 pca_dos$cargas
+pca_dos$indicadores
 
 # #generar reporte en excel
 # 

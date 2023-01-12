@@ -16,11 +16,13 @@ rm(list = ls())
 library(here)
 library(rio)
 library(tidyverse)
+devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/main/funciones/0-funciones-nuevas-22.R")
+source(here("00-insumos", "0-funciones-apoyo.R"))
 
 # (A) Cargamos la información 
 
 # bases de datos 
-lista = rio::import_list(Sys.glob(here("01-data", "01-depuradas", "*.sav")))
+lista = rio::import_list(Sys.glob(here("01-data", "01-depuradas2", "*.sav")))
 
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
@@ -30,12 +32,13 @@ names(lista)
 map(lista, names)
 
 # nombres de las bases en el miau
-nom <- c("EM2022_2SdocenteCOM_EBR", 
+nom <- c("EM2022_2SdocenteCOM_EBR",
          "EM2022_2SdocenteMAT_EBR",
-         "EM2022_2SdocenteCYT_EBR", 
-         "EM2022_2Sdirector_EBR", 
-         "EM2022_2Sestudiante_EBRD1",
-         "EM2022_2Sestudiante_EBRD2")
+         "EM2022_2SdocenteCYT_EBR",
+         "EM2022_2Sdirector_EBR",
+         "EM2022_2Sestudiante_EBRD2",
+         "EM2022_2Sestudiante_EBRD1")
+
 
 lista <- setNames(lista, nom)
 
@@ -56,7 +59,14 @@ est <- select(est, cor_minedu, cor_est, id2)
 dupli(est, "id2")
 
 doc <- lista$EM2022_2SdocenteCOM_EBR
-dupli(doc, "cor-minedu")
+dupli(lista$EM2022_2SdocenteCYT_EBR, "cor-minedu")
+
+lista$EM2022_2Sestudiante_EBRD1 <- distinct(lista$EM2022_2Sestudiante_EBRD1, cor_minedu, cor_est, .keep_all = TRUE)
+lista$EM2022_2Sestudiante_EBRD2 <- distinct(lista$EM2022_2Sestudiante_EBRD2, cor_minedu, cor_est, .keep_all = TRUE)
+lista$EM2022_2Sestudiante_EBRD1 <- drop_na(lista$EM2022_2Sestudiante_EBRD1, cor_minedu, cor_est)
+lista$EM2022_2Sestudiante_EBRD2 <- drop_na(lista$EM2022_2Sestudiante_EBRD2, cor_minedu, cor_est)
+
+map(lista, nrow)
 
 # como estan? 
 # map(1:length(lista), ~sapply(lista[[.x]][preg_recod[[.x]]], table))
@@ -133,7 +143,6 @@ lista2$EM2022_2Sestudiante_EBRD1 <- lista2$EM2022_2Sestudiante_EBRD1 %>%
 
 
 # (2.1) agregar columnas de conocimiento pedagogico ----
-claves <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0", 2)
 f1 <- function(p, c){ifelse(p == c, 1, 0)} # funcion de ayuda
 
 conc <- unique(claves$Concatena1)
@@ -166,7 +175,7 @@ for(i in 1:length(lista2)){ #i=4
 
 #lista2[[2]] %>% View()
 
-devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/main/funciones/0-funciones-nuevas-22.R")
+
 
 # (4) colocar labels (atributos a las columnas) ----
 recodtipo <- setNames(c("C1", "C2", "RA", "RN"), c("Categorico1", "Categorico2", "Abierta", "Numerica"))
@@ -195,8 +204,7 @@ lista3 <- map2(lista2, labels_l, ~asigna_label(.x, .y$label, .y$cod_preg))
 # para pegar más facil despues! 
 lista3 <- map(lista3, ~tibble::rowid_to_column(.x, "ID"))
 
-names(lista3)
+#names(lista3)
 export_list(lista3, here("01-data", "02-con-etiquetas", paste0(names(lista3), ".sav")))
-
 
 

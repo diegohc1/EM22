@@ -15,7 +15,7 @@ devtools::source_url("https://raw.githubusercontent.com/diegohc1/para_funciones/
 source(here("00-insumos", "0-funciones-apoyo.R"))
 
 # cargamos y acomodamos datos **********************
-lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01-imputadas", "*.rds")))
+lista = rio::import_list(Sys.glob(here("01-data", "03-intermedias", "01a-imputadas", "*.rds")))
 
 # MIAU 😺
 matriz <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8fGxnB3vL7sF3fLE2Dheqopb1Ykg0DTrboFZWEcRKM/edit#gid=0")
@@ -64,7 +64,7 @@ for(i in 1:length(nom)){ #i=5
     bd2 <- drop_na(bd1) # listo para correr! 
     
     
-    prec[[i]][[vcod_indice[j]]]  <- tryCatch({ # para ver donde estan los warnings 
+    #prec[[i]][[vcod_indice[j]]]  <- tryCatch({ # para ver donde estan los warnings 
     
     # Corremos el modelo según PCA o CFA
     if(tipo[j] == "PCA"){ 
@@ -74,8 +74,8 @@ for(i in 1:length(nom)){ #i=5
       resultados1 <- cfa_recursivo(bd2, model_lavaan = mod, recursivo = TRUE, puntajes = FALSE)
     }
     
-      }, warning = function(w) print(w$message)
-    )
+    #  }, warning = function(w) print(w$message)
+    #)
     
     
     # Ordenamos la información

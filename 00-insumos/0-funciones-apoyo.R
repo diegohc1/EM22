@@ -92,3 +92,32 @@ rowSumsNA <- function(x) rowSums(is.na(x))
 # invertir escalas
 invertir <- function(x, i) i+1 - x 
 
+
+
+recodefac <- list(
+  
+  acuerdo = setNames(
+    c("Totalmente en desacuerdo", "En desacuerdo", "De acuerdo", "Totalmente de acuerdo"),
+    c(rep("En desacuerdo o totalmente en desacuerdo", 2), rep("De acuerdo o totalmente de acuerdo", 2))),
+  
+  freq_clases = setNames(
+    c("Nunca o casi nunca", "En algunas clases", "En la mayoría de clases", "En todas las clases o en casi todas"),
+    c(rep("Nunca o en algunas clases", 2), rep("En la mayoria o en todas las clases", 2))),
+  
+  freq1 = setNames(
+    c("Nunca o casi nunca", "Pocas veces", "Muchas veces", "Siempre o casi siempre"),
+    c(rep("Nunca o pocas veces", 2), rep("Muchas veces o siempre", 2))),
+  
+  freq2 = setNames(
+    c("Nunca", "Pocas veces", "Muchas veces", "Siempre"),
+    c(rep("Nunca o pocas veces", 2), rep("Muchas veces o siempre", 2))),
+  
+  facil = setNames(
+    c("Muy difícil", "Difícil", "Fácil", "Muy fácil"),
+    c(rep("Difícil o muy difícil", 2), rep("Facíl o muy facíl", 2)))
+  
+)
+
+
+
+

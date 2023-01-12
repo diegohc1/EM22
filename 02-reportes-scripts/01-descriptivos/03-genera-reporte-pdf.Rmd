@@ -34,7 +34,7 @@ tab_final2 <- tab_final2 %>%
          cod_gen = ifelse(Concatena1 == "EM2022_2SdocenteMAT_EBR" & cod_gen %in% demate, cod_preg, cod_gen))
 # *~~~~~
 
-bd <- filter(tab_final2, estrato == "Publica") %>%
+bd <- filter(tab_final2, estrato == "General") %>%
   mutate(rut = paste0(Concatena1, "_", cod_gen))
 
 

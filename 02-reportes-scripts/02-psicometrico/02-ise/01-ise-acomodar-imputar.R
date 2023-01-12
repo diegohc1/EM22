@@ -65,7 +65,8 @@ lista_iseb <- map2(lista_ise, ise_recod, function(x, y) rename_with(x, ~y[["cod"
 # (1) recodificamos  ----
 
 # 1. nivel educativo -----
-recod_edu_est <- set_names(c(0, 3, 6, 8.5, 11, 7.5, 9, 12.5, 14, 13.5, 16, 19), 1:12)
+# recod_edu_fam <- set_names(c(0, 3, 6, 8.5, 11, 7.5, 9, 12.5, 14, 13.5, 16, 19), 1:12)
+recod_edu_est <- set_names(c(0, 3, 6, 8.5, 11, 12.5, 14, 13.5, 16, 19), 1:10)
 
 # 2. materiales de vivienda ----
 
@@ -150,6 +151,7 @@ lapply(bd_para_imputar_l, function(x) sapply(x[items_ise], class))
 # loop para imputar
 nom <- names(bd_para_imputar_l)
 bd_complete_l <- map(lista, function(x) NULL)
+
 
 for(i in 1:length(nom)){ #i=1
   
